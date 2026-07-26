@@ -262,7 +262,11 @@ function App() {
   })
 
 
+function isValidPhone(phone) {
 
+  return /^[0-9]{10}$/.test(phone);
+
+}
 
 
 
@@ -501,6 +505,15 @@ function addToCart(product) {
 
     }
 
+    if(!isValidPhone(customer.phone)){
+
+  alert(
+    "Please enter a valid 10 digit phone number."
+  )
+
+  return;
+
+}
 
 
     let message =
@@ -560,7 +573,15 @@ Final Total:
 
     }
 
+if(!isValidPhone(customer.phone)){
 
+  alert(
+    "Please enter a valid 10 digit phone number."
+  )
+
+  return;
+
+}
 
 
     let message =

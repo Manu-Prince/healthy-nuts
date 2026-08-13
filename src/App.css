@@ -1155,3 +1155,55 @@ footer {
   border-radius: 10px;
   color: #333;
 }
+
+/* =========================
+   FORM VALIDATION
+========================= */
+
+.form-field {
+  width: 100%;
+  margin-bottom: 8px;
+  text-align: left;
+}
+
+.form-field input,
+.form-field textarea {
+  margin: 8px 0 2px;
+}
+
+.form-field .input-error {
+  border: 2px solid #e53935 !important;
+  background: #fff5f5 !important;
+}
+
+.form-field .input-valid {
+  border: 2px solid #43a047 !important;
+  background: #f8fff8 !important;
+}
+
+.field-error {
+  display: block;
+  color: #ffebee;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 3px 2px 7px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-row .form-field {
+  margin-bottom: 8px;
+}
+
+@media (max-width: 600px) {
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+}

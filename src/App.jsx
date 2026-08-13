@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FaWhatsapp, FaBars, FaTimes, FaShoppingCart } from 'react-icons/fa'
+import { FaWhatsapp } from 'react-icons/fa'
 import './App.css'
 
 
@@ -71,6 +71,10 @@ function ProductCard({
       <p>{description}</p>
 
 
+      {/* ================================
+          WEIGHT
+      ================================= */}
+
       <div className="weight">
 
         {
@@ -97,10 +101,17 @@ function ProductCard({
       </h4>
 
 
+      {/* ================================
+          PRODUCT QUANTITY
+      ================================= */}
+
       <div className="quantity-box">
+
+        {/* MINUS - RED */}
 
         <button
           type="button"
+          className="quantity-minus"
           onClick={() =>
             updateProductQuantity(
               `${name}-${weight}`,
@@ -111,15 +122,18 @@ function ProductCard({
             )
           }
         >
-          -
+          −
         </button>
 
 
         <b>{quantity}</b>
 
 
+        {/* PLUS - GREEN */}
+
         <button
           type="button"
+          className="quantity-plus"
           onClick={() =>
             updateProductQuantity(
               `${name}-${weight}`,
@@ -141,6 +155,10 @@ function ProductCard({
       </p>
 
 
+      {/* ================================
+          ADD TO CART
+      ================================= */}
+
       <button
         type="button"
         onClick={() =>
@@ -156,6 +174,10 @@ function ProductCard({
         Add to Cart
       </button>
 
+
+      {/* ================================
+          DIRECT ORDER
+      ================================= */}
 
       <button
         type="button"
@@ -273,7 +295,8 @@ function App() {
     }
     else if (customer.name.trim().length < 2) {
 
-      newErrors.name = "Name must contain at least 2 characters."
+      newErrors.name =
+        "Name must contain at least 2 characters."
 
     }
 
@@ -282,7 +305,8 @@ function App() {
 
     if (!customer.phone.trim()) {
 
-      newErrors.phone = "Please enter your phone number."
+      newErrors.phone =
+        "Please enter your phone number."
 
     }
     else if (!/^[6-9][0-9]{9}$/.test(customer.phone)) {
@@ -297,7 +321,8 @@ function App() {
 
     if (!customer.pincode.trim()) {
 
-      newErrors.pincode = "Please enter your 6-digit pincode."
+      newErrors.pincode =
+        "Please enter your 6-digit pincode."
 
     }
     else if (!/^[0-9]{6}$/.test(customer.pincode)) {
@@ -312,7 +337,8 @@ function App() {
 
     if (!customer.city.trim()) {
 
-      newErrors.city = "Please enter your city."
+      newErrors.city =
+        "Please enter your city."
 
     }
     else if (customer.city.trim().length < 2) {
@@ -327,7 +353,8 @@ function App() {
 
     if (!customer.state) {
 
-      newErrors.state = "Please select your state."
+      newErrors.state =
+        "Please select your state."
 
     }
 
@@ -416,9 +443,10 @@ function App() {
 
   function addToCart(product) {
 
-    const existing = cart.find(
-      item => item.id === product.id
-    )
+    const existing =
+      cart.find(
+        item => item.id === product.id
+      )
 
 
     if (existing) {
@@ -837,53 +865,68 @@ Final Total:
 
       <header className="header">
 
-  <div className="logo-section">
+        <div className="logo-section">
 
-    <img
-      src="/images/logo.jpeg"
-      alt="Healthy Nuts Logo"
-    />
+          <img
+            src="/images/logo.jpeg"
+            alt="Healthy Nuts Logo"
+          />
 
-    <div className="brand-text">
+          <div className="brand-text">
 
-      <h1>
-        Healthy Nuts
-      </h1>
+            <h1>
+              Healthy Nuts
+            </h1>
 
-      <p className="brand-tagline">
-        Premium • Fresh • Natural
-      </p>
+            <p className="brand-tagline">
+              Premium • Fresh • Natural
+            </p>
 
-    </div>
+          </div>
 
-  </div>
+        </div>
 
 
-  <nav>
+        <nav>
 
-    <a href="#home">
-      Home
-    </a>
+          <a
+            href="#home"
+            onClick={closeMobileMenu}
+          >
+            Home
+          </a>
 
-    <a href="#products">
-      Products
-    </a>
+          <a
+            href="#products"
+            onClick={closeMobileMenu}
+          >
+            Products
+          </a>
 
-    <a href="#cart">
-      Cart ({cart.length})
-    </a>
+          <a
+            href="#cart"
+            onClick={closeMobileMenu}
+          >
+            Cart ({cart.length})
+          </a>
 
-    <a href="#reviews">
-      Reviews
-    </a>
+          <a
+            href="#reviews"
+            onClick={closeMobileMenu}
+          >
+            Reviews
+          </a>
 
-    <a href="#contact">
-      Contact
-    </a>
+          <a
+            href="#contact"
+            onClick={closeMobileMenu}
+          >
+            Contact
+          </a>
 
-  </nav>
+        </nav>
 
-</header>
+      </header>
 
 
       {/* ================================
@@ -971,9 +1014,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -991,9 +1032,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1011,9 +1050,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1031,9 +1068,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1051,9 +1086,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1071,9 +1104,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1091,9 +1122,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1111,9 +1140,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1131,9 +1158,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1151,9 +1176,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1171,9 +1194,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1191,9 +1212,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1211,9 +1230,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1231,9 +1248,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1312,25 +1327,38 @@ Final Total:
                 </div>
 
 
+                {/* ================================
+                    CART ACTIONS
+                ================================= */}
+
                 <div className="cart-actions">
 
                   <div className="cart-quantity">
 
+
+                    {/* CART MINUS - RED */}
+
                     <button
                       type="button"
+                      className="cart-minus"
                       onClick={() =>
                         updateQuantity(index, -1)
                       }
                     >
-                      -
+                      −
                     </button>
+
 
                     <b>
                       {item.quantity}
                     </b>
 
+
+                    {/* CART PLUS - GREEN */}
+
                     <button
                       type="button"
+                      className="cart-plus"
                       onClick={() =>
                         updateQuantity(index, 1)
                       }
@@ -1340,6 +1368,8 @@ Final Total:
 
                   </div>
 
+
+                  {/* REMOVE */}
 
                   <button
                     type="button"
@@ -1365,6 +1395,7 @@ Final Total:
           <div className="cart-summary">
 
             <div>
+
               <span>
                 Subtotal
               </span>
@@ -1372,21 +1403,26 @@ Final Total:
               <strong>
                 ₹{subtotal()}
               </strong>
+
             </div>
 
 
             <div>
+
               <span>
                 Delivery
               </span>
 
               <strong>
+
                 {
                   deliveryCharge() === 0
                     ? "FREE 🎉"
                     : "₹50"
                 }
+
               </strong>
+
             </div>
 
 

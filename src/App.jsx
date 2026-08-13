@@ -843,8 +843,149 @@ Final Total:
   cart={cart}
   updateProductQuantity={updateProductQuantity}
 />
-```
+{/* Akhroot */}
+<ProductCard
+  image="/images/akhroot.png"
+  name="Akhroot"
+  description="Premium Walnuts"
+  prices={{
+    "250g": 199,
+    "500g": 199,
+    "1kg": 199
+  }}
+  addToCart={addToCart}
+  directOrder={directOrder}
+  cart={cart}
+  updateProductQuantity={updateProductQuantity}
+/>
 
+{/* Alsi */}
+<ProductCard
+  image="/images/alsi.png"
+  name="Alsi"
+  description="Premium Flax Seeds"
+  prices={{
+    "250g": 199,
+    "500g": 199,
+    "1kg": 199
+  }}
+  addToCart={addToCart}
+  directOrder={directOrder}
+  cart={cart}
+  updateProductQuantity={updateProductQuantity}
+/>
+
+{/* Anjeer */}
+<ProductCard
+  image="/images/anjeer.png"
+  name="Anjeer"
+  description="Premium Dried Figs"
+  prices={{
+    "250g": 199,
+    "500g": 199,
+    "1kg": 199
+  }}
+  addToCart={addToCart}
+  directOrder={directOrder}
+  cart={cart}
+  updateProductQuantity={updateProductQuantity}
+/>
+
+{/* Makhana */}
+<ProductCard
+  image="/images/makhana.png"
+  name="Makhana"
+  description="Premium Fox Nuts"
+  prices={{
+    "250g": 199,
+    "500g": 199,
+    "1kg": 199
+  }}
+  addToCart={addToCart}
+  directOrder={directOrder}
+  cart={cart}
+  updateProductQuantity={updateProductQuantity}
+/>
+
+{/* Kharbooja Ke Beej */}
+<ProductCard
+  image="/images/kharbooja-ke-beej.png"
+  name="Kharbooja Ke Beej"
+  description="Premium Melon Seeds"
+  prices={{
+    "250g": 199,
+    "500g": 199,
+    "1kg": 199
+  }}
+  addToCart={addToCart}
+  directOrder={directOrder}
+  cart={cart}
+  updateProductQuantity={updateProductQuantity}
+/>
+
+{/* Kaddu Ka Beej */}
+<ProductCard
+  image="/images/kaddu-ka-beej.png"
+  name="Kaddu Ka Beej"
+  description="Premium Pumpkin Seeds"
+  prices={{
+    "250g": 199,
+    "500g": 199,
+    "1kg": 199
+  }}
+  addToCart={addToCart}
+  directOrder={directOrder}
+  cart={cart}
+  updateProductQuantity={updateProductQuantity}
+/>
+
+{/* Surajmukhi Ka Beej */}
+<ProductCard
+  image="/images/surajmukhi-ka-beej.png"
+  name="Surajmukhi Ka Beej"
+  description="Premium Sunflower Seeds"
+  prices={{
+    "250g": 199,
+    "500g": 199,
+    "1kg": 199
+  }}
+  addToCart={addToCart}
+  directOrder={directOrder}
+  cart={cart}
+  updateProductQuantity={updateProductQuantity}
+/>
+
+{/* Dry Fruit Mix */}
+<ProductCard
+  image="/images/dry-fruit-mix.png"
+  name="Dry Fruit Mix"
+  description="Premium Dry Fruit Mix"
+  prices={{
+    "250g": 199,
+    "500g": 199,
+    "1kg": 199
+  }}
+  addToCart={addToCart}
+  directOrder={directOrder}
+  cart={cart}
+  updateProductQuantity={updateProductQuantity}
+/>
+
+{/* Seeds Mix */}
+<ProductCard
+  image="/images/seeds-mix.png"
+  name="Seeds Mix"
+  description="Premium Seeds Mix"
+  prices={{
+    "250g": 199,
+    "500g": 199,
+    "1kg": 199
+  }}
+  addToCart={addToCart}
+  directOrder={directOrder}
+  cart={cart}
+  updateProductQuantity={updateProductQuantity}
+/>
 
 </div>
 

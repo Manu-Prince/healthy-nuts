@@ -1207,3 +1207,858 @@ footer {
   }
 
 }
+
+/* =========================================
+   PREMIUM FORM
+========================================= */
+
+.form-field {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 16px;
+}
+
+.form-field label {
+  display: block;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 7px;
+}
+
+.form-field label span {
+  color: #ffd54f;
+  margin-left: 3px;
+}
+
+.form-field input,
+.form-field textarea,
+.form-field select {
+  width: 100%;
+  padding: 14px 15px;
+  border: 2px solid #d8ead9;
+  border-radius: 10px;
+  background: #fff;
+  color: #333;
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+  transition: 0.25s ease;
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+  border-color: #d4af37;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+}
+
+.form-field textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.form-field select {
+  cursor: pointer;
+}
+
+.form-field.has-error input,
+.form-field.has-error textarea,
+.form-field.has-error select {
+  border-color: #ff5252;
+  background: #fff8f8;
+}
+
+.error-message {
+  display: block;
+  color: #ffd1d1;
+  font-size: 13px;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+.direct-order-preview {
+  background: #fff8e1;
+  border-left: 4px solid #d4af37;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  color: #333;
+  text-align: left;
+}
+
+.direct-order-preview span {
+  color: #967a18;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.direct-order-preview h4 {
+  margin: 6px 0;
+  color: #2e5d34;
+}
+
+.direct-order-preview p {
+  margin: 5px 0;
+}
+
+.direct-order-preview strong {
+  color: #967a18;
+}
+
+
+/* =========================================
+   FORM HEADING
+========================================= */
+
+.form-label {
+  display: block;
+  color: #d4af37;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin-bottom: 7px;
+}
+
+.form-subtitle {
+  color: #e8f5e9;
+  margin-bottom: 25px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+
+/* =========================================
+   WHATSAPP ORDER BUTTON
+========================================= */
+
+.whatsapp-order-button {
+  width: 100%;
+  padding: 15px;
+  margin-top: 8px;
+  background: #25d366;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  transition: 0.25s ease;
+}
+
+.whatsapp-order-button:hover {
+  background: #128c7e;
+  transform: translateY(-2px);
+}
+
+.privacy-note {
+  color: #c8e6c9;
+  font-size: 12px;
+  margin-top: 18px;
+}
+
+
+/* =========================================
+   PREMIUM HEADER
+========================================= */
+
+.logo-section > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-section span {
+  color: #d8e8d2;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 3px 20px rgba(0, 0, 0, 0.12);
+}
+
+.header nav {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.header nav a {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 12px;
+  border-radius: 7px;
+  transition: 0.2s ease;
+}
+
+.header nav a:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+
+/* =========================================
+   MOBILE MENU BUTTON
+========================================= */
+
+.menu-toggle {
+  display: none;
+  width: 44px !important;
+  height: 44px;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  color: white;
+  border: 1px solid rgba(255,255,255,0.3) !important;
+  border-radius: 8px;
+  font-size: 21px;
+  cursor: pointer;
+}
+
+
+/* =========================================
+   HERO
+========================================= */
+
+.hero-content {
+  max-width: 800px;
+  margin: auto;
+}
+
+.hero-badge {
+  display: inline-block;
+  padding: 7px 13px;
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 30px;
+  font-size: 11px;
+  letter-spacing: 2px;
+  margin-bottom: 18px;
+  background: rgba(0,0,0,0.15);
+}
+
+.hero-content button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+/* =========================================
+   SECTION DESIGN
+========================================= */
+
+.section-label {
+  display: block;
+  color: #b08d20;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.section-description {
+  color: #777;
+  margin-top: -25px;
+  margin-bottom: 35px;
+}
+
+
+/* =========================================
+   CART
+========================================= */
+
+.empty-cart {
+  max-width: 500px;
+  margin: 30px auto 50px;
+  padding: 40px 20px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+}
+
+.empty-cart > div {
+  font-size: 45px;
+}
+
+.empty-cart h3 {
+  color: #2e7d32;
+}
+
+.empty-cart p {
+  color: #777;
+}
+
+.cart-item-info strong {
+  color: #967a18;
+  font-size: 18px;
+}
+
+.cart-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.cart-quantity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cart-quantity button {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.remove-button {
+  background: #b52b2b !important;
+}
+
+
+/* =========================================
+   CART SUMMARY
+========================================= */
+
+.cart-summary {
+  width: 90%;
+  max-width: 600px;
+  margin: 25px auto;
+  background: #fff;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  text-align: left;
+}
+
+.cart-summary > div {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  color: #555;
+}
+
+.cart-summary .grand-total {
+  border-top: 1px solid #ddd;
+  margin-top: 8px;
+  padding-top: 15px;
+  font-size: 21px;
+  color: #2e7d32;
+}
+
+
+/* =========================================
+   REVIEWS
+========================================= */
+
+.reviews-container {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  flex-wrap: wrap;
+}
+
+.review-card {
+  margin: 0;
+}
+
+.stars {
+  color: #d4af37;
+  margin-bottom: 12px;
+}
+
+
+/* =========================================
+   CONTACT
+========================================= */
+
+.contact button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.footer-logo {
+  color: #d4af37;
+  font-size: 23px;
+  font-weight: 700;
+}
+
+
+/* =========================================
+   SUCCESS
+========================================= */
+
+.success-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #2e7d32;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 45px;
+  margin-bottom: 15px;
+}
+
+
+/* =========================================
+   FLOATING WHATSAPP
+========================================= */
+
+.whatsapp-float {
+  border: none;
+  cursor: pointer;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+
+  .header {
+    position: sticky;
+    top: 0;
+    flex-direction: row;
+    padding: 12px 15px;
+    gap: 10px;
+  }
+
+  .logo-section {
+    gap: 9px;
+  }
+
+  .logo-section img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .logo-section h1 {
+    font-size: 20px;
+  }
+
+  .logo-section span {
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+
+  .menu-toggle {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .header nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #245f29;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.18);
+  }
+
+  .header nav.mobile-nav.active {
+    display: flex;
+  }
+
+  .header nav a {
+    width: 100%;
+    padding: 14px 16px;
+    margin: 0;
+    border-radius: 8px;
+  }
+
+  .hero {
+    padding: 70px 18px;
+  }
+
+  .hero h2 {
+    font-size: 32px;
+    line-height: 1.15;
+  }
+
+  .hero p {
+    font-size: 17px;
+    line-height: 1.5;
+  }
+
+  .products {
+    padding: 45px 12px;
+  }
+
+  .products h2,
+  .cart h2,
+  .reviews h2,
+  .contact h2 {
+    font-size: 28px;
+  }
+
+  .product-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .product-card {
+    width: 100%;
+    max-width: 380px;
+    margin: auto;
+  }
+
+  .customer-form {
+    width: 94%;
+    padding: 22px 17px;
+  }
+
+  .cart-item {
+    width: 94%;
+    padding: 18px 14px;
+  }
+
+  .cart-summary {
+    width: 94%;
+  }
+
+  .reviews-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .review-card {
+    width: 94%;
+    max-width: 380px;
+  }
+
+  .contact {
+    padding: 45px 18px;
+  }
+
+  .whatsapp-float {
+    width: 55px;
+    height: 55px;
+    right: 18px;
+    bottom: 18px;
+    font-size: 28px;
+  }
+
+}
+
+
+/* =========================================
+   SMALL PHONES
+========================================= */
+
+@media (max-width: 400px) {
+
+  .logo-section h1 {
+    font-size: 18px;
+  }
+
+  .logo-section span {
+    display: none;
+  }
+
+  .hero h2 {
+    font-size: 28px;
+  }
+
+  .weight {
+    gap: 5px;
+  }
+
+  .weight button {
+    padding: 7px 9px;
+    font-size: 13px;
+  }
+
+}
+
+/* ================================
+   PREMIUM BRAND HEADER
+================================ */
+
+.header {
+  width: 100%;
+  background: linear-gradient(
+    135deg,
+    #1b5e20,
+    #2e7d32
+  );
+
+  color: white;
+
+  padding: 16px 30px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 30px;
+}
+
+
+/* Logo + Brand */
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  flex-shrink: 0;
+}
+
+
+.logo-section img {
+  width: 62px;
+  height: 62px;
+
+  object-fit: cover;
+
+  border-radius: 50%;
+
+  border: 2px solid #d4af37;
+
+  box-shadow:
+    0 3px 10px rgba(0,0,0,0.25);
+}
+
+
+/* Brand text container */
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+
+  min-width: 0;
+}
+
+
+/* Main heading */
+
+.logo-section h1 {
+  margin: 0;
+
+  font-size: 28px;
+
+  line-height: 1.1;
+
+  color: #ffffff;
+
+  white-space: nowrap;
+}
+
+
+/* Tagline */
+
+.brand-tagline {
+  margin: 5px 0 0;
+
+  font-size: 12px;
+
+  line-height: 1.2;
+
+  color: #f5d76e;
+
+  letter-spacing: 1.5px;
+
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+
+/* Navigation */
+
+.header nav {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-end;
+
+  flex-wrap: wrap;
+
+  gap: 6px;
+}
+
+
+.header nav a {
+  color: white;
+
+  margin: 0;
+
+  padding: 8px 10px;
+
+  text-decoration: none;
+
+  font-size: 15px;
+
+  font-weight: 500;
+
+  border-radius: 6px;
+
+  transition: 0.25s;
+}
+
+
+.header nav a:hover {
+  background: rgba(255,255,255,0.15);
+
+  color: #f5d76e;
+}
+
+
+/* ================================
+   MOBILE HEADER
+================================ */
+
+@media (max-width: 768px) {
+
+  .header {
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    text-align: center;
+
+    padding: 18px 12px;
+
+    gap: 14px;
+  }
+
+
+  .logo-section {
+
+    width: 100%;
+
+    justify-content: center;
+
+    gap: 12px;
+  }
+
+
+  .logo-section img {
+
+    width: 58px;
+
+    height: 58px;
+  }
+
+
+  .logo-section h1 {
+
+    font-size: 25px;
+
+  }
+
+
+  .brand-tagline {
+
+    font-size: 10px;
+
+    letter-spacing: 1.2px;
+
+    margin-top: 4px;
+
+  }
+
+
+  .header nav {
+
+    width: 100%;
+
+    justify-content: center;
+
+    gap: 5px;
+
+  }
+
+
+  .header nav a {
+
+    font-size: 13px;
+
+    padding: 7px 8px;
+
+  }
+
+}
+
+
+/* Very small phones */
+
+@media (max-width: 420px) {
+
+  .header {
+
+    padding: 15px 8px;
+
+  }
+
+
+  .logo-section img {
+
+    width: 52px;
+
+    height: 52px;
+
+  }
+
+
+  .logo-section h1 {
+
+    font-size: 22px;
+
+  }
+
+
+  .brand-tagline {
+
+    font-size: 9px;
+
+    letter-spacing: 1px;
+
+  }
+
+
+  .header nav a {
+
+    font-size: 12px;
+
+    padding: 6px 6px;
+
+  }
+
+}

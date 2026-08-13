@@ -1,12 +1,11 @@
 import { useState } from 'react'
-import { FaWhatsapp } from 'react-icons/fa'
+import { FaWhatsapp, FaBars, FaTimes, FaShoppingCart } from 'react-icons/fa'
 import './App.css'
 
 
-
-/* =========================
-   WHATSAPP FUNCTION
-========================= */
+/* ================================
+   WHATSAPP
+================================ */
 
 function openWhatsApp(message) {
 
@@ -19,10 +18,9 @@ function openWhatsApp(message) {
 }
 
 
-
-/* =========================
+/* ================================
    PRODUCT CARD
-========================= */
+================================ */
 
 function ProductCard({
   image,
@@ -37,53 +35,41 @@ function ProductCard({
 
   const [weight, setWeight] = useState("250g")
 
-
   const quantity =
     cart.find(
-      item =>
-        item.id === `${name}-${weight}`
+      item => item.id === `${name}-${weight}`
     )?.quantity || 1
-
 
 
   function orderProduct() {
 
     directOrder({
-
       name,
       weight,
       quantity,
       price: prices[weight]
-
     })
 
   }
-
 
 
   return (
 
     <div className="product-card">
 
-
       <img
         src={image}
         alt={name}
+        onError={(e) => {
+          e.currentTarget.style.background = "#f5f1e8"
+          e.currentTarget.alt = `${name} image`
+        }}
       />
 
+      <h3>{name}</h3>
 
-      <h3>
-        {name}
-      </h3>
+      <p>{description}</p>
 
-
-      <p>
-        {description}
-      </p>
-
-
-
-      {/* WEIGHT */}
 
       <div className="weight">
 
@@ -91,23 +77,13 @@ function ProductCard({
           ["250g", "500g", "1kg"].map(item => (
 
             <button
-
               key={item}
-
               className={
-                weight === item
-                  ? "active"
-                  : ""
+                weight === item ? "active" : ""
               }
-
-              onClick={() =>
-                setWeight(item)
-              }
-
+              onClick={() => setWeight(item)}
             >
-
               {item}
-
             </button>
 
           ))
@@ -116,25 +92,15 @@ function ProductCard({
       </div>
 
 
-
-      {/* PRICE */}
-
       <h4>
-
-        Price per pack:
-        ₹{prices[weight]}
-
+        Price per pack: ₹{prices[weight]}
       </h4>
 
 
-
-      {/* QUANTITY */}
-
       <div className="quantity-box">
 
-
         <button
-
+          type="button"
           onClick={() =>
             updateProductQuantity(
               `${name}-${weight}`,
@@ -144,23 +110,16 @@ function ProductCard({
               prices[weight]
             )
           }
-
         >
-
           -
-
         </button>
 
 
-
-        <b>
-          {quantity}
-        </b>
-
+        <b>{quantity}</b>
 
 
         <button
-
+          type="button"
           onClick={() =>
             updateProductQuantity(
               `${name}-${weight}`,
@@ -170,16 +129,11 @@ function ProductCard({
               prices[weight]
             )
           }
-
         >
-
           +
-
         </button>
 
-
       </div>
-
 
 
       <p>
@@ -187,51 +141,28 @@ function ProductCard({
       </p>
 
 
-
-      {/* ADD TO CART */}
-
       <button
-
+        type="button"
         onClick={() =>
-
           addToCart({
-
             id: `${name}-${weight}`,
-
             name,
-
             weight,
-
             price: prices[weight],
-
             quantity: 1
-
           })
-
         }
-
       >
-
         Add to Cart
-
       </button>
 
 
-
-      <br />
-
-
-
-      {/* DIRECT ORDER */}
-
       <button
+        type="button"
         onClick={orderProduct}
       >
-
         Order {name}
-
       </button>
-
 
     </div>
 
@@ -240,299 +171,254 @@ function ProductCard({
 }
 
 
-
-/* =========================
+/* ================================
    APP
-========================= */
+================================ */
 
 function App() {
 
-
   const [cart, setCart] = useState([])
 
+  const [orderSuccess, setOrderSuccess] = useState(false)
 
-  const [orderSuccess, setOrderSuccess] =
-    useState(false)
+  const [directProduct, setDirectProduct] = useState(null)
 
-
-  const [directProduct, setDirectProduct] =
-    useState(null)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
 
-
-  /* =========================
+  /* ================================
      CUSTOMER DETAILS
-  ========================= */
+  ================================= */
 
   const [customer, setCustomer] = useState({
 
     name: "",
     phone: "",
-    address: "",
     pincode: "",
     city: "",
-    state: ""
+    state: "",
+    address: ""
 
   })
 
 
+  /* ================================
+     FORM ERRORS
+  ================================= */
 
-  /* =========================
-     FORM VALIDATION
-  ========================= */
-
-  const [formErrors, setFormErrors] =
-    useState({})
+  const [errors, setErrors] = useState({})
 
 
-  const [formTouched, setFormTouched] =
-    useState({})
+  /* ================================
+     STATES
+  ================================= */
+
+  const states = [
+
+    "Andhra Pradesh",
+    "Arunachal Pradesh",
+    "Assam",
+    "Bihar",
+    "Chhattisgarh",
+    "Goa",
+    "Gujarat",
+    "Haryana",
+    "Himachal Pradesh",
+    "Jharkhand",
+    "Karnataka",
+    "Kerala",
+    "Madhya Pradesh",
+    "Maharashtra",
+    "Manipur",
+    "Meghalaya",
+    "Mizoram",
+    "Nagaland",
+    "Odisha",
+    "Punjab",
+    "Rajasthan",
+    "Sikkim",
+    "Tamil Nadu",
+    "Telangana",
+    "Tripura",
+    "Uttar Pradesh",
+    "Uttarakhand",
+    "West Bengal",
+    "Andaman and Nicobar Islands",
+    "Chandigarh",
+    "Dadra and Nagar Haveli and Daman and Diu",
+    "Delhi",
+    "Jammu and Kashmir",
+    "Ladakh",
+    "Lakshadweep",
+    "Puducherry"
+
+  ]
 
 
+  /* ================================
+     VALIDATION
+  ================================= */
 
-  function validateField(field, value) {
+  function validateCustomer() {
 
-    let error = ""
+    const newErrors = {}
 
 
     /* NAME */
 
-    if (field === "name") {
+    if (!customer.name.trim()) {
 
-      if (!value.trim()) {
+      newErrors.name = "Please enter your name."
 
-        error =
-          "Please enter your name."
+    }
+    else if (customer.name.trim().length < 2) {
 
-      }
-
-      else if (
-        value.trim().length < 2
-      ) {
-
-        error =
-          "Name must be at least 2 characters."
-
-      }
+      newErrors.name = "Name must contain at least 2 characters."
 
     }
 
+
+    /* PHONE */
+
+    if (!customer.phone.trim()) {
+
+      newErrors.phone = "Please enter your phone number."
+
+    }
+    else if (!/^[6-9][0-9]{9}$/.test(customer.phone)) {
+
+      newErrors.phone =
+        "Please enter a valid 10-digit Indian mobile number."
+
+    }
+
+
+    /* PINCODE */
+
+    if (!customer.pincode.trim()) {
+
+      newErrors.pincode = "Please enter your 6-digit pincode."
+
+    }
+    else if (!/^[0-9]{6}$/.test(customer.pincode)) {
+
+      newErrors.pincode =
+        "Pincode must contain exactly 6 digits."
+
+    }
+
+
+    /* CITY */
+
+    if (!customer.city.trim()) {
+
+      newErrors.city = "Please enter your city."
+
+    }
+    else if (customer.city.trim().length < 2) {
+
+      newErrors.city =
+        "Please enter a valid city name."
+
+    }
+
+
+    /* STATE */
+
+    if (!customer.state) {
+
+      newErrors.state = "Please select your state."
+
+    }
+
+
+    /* ADDRESS */
+
+    if (!customer.address.trim()) {
+
+      newErrors.address =
+        "Please enter your complete delivery address."
+
+    }
+    else if (customer.address.trim().length < 10) {
+
+      newErrors.address =
+        "Please enter a more complete address."
+
+    }
+
+
+    setErrors(newErrors)
+
+    return Object.keys(newErrors).length === 0
+
+  }
+
+
+  /* ================================
+     HANDLE FIELD CHANGE
+  ================================= */
+
+  function handleCustomerChange(field, value) {
+
+    let newValue = value
 
 
     /* PHONE */
 
     if (field === "phone") {
 
-      if (!value.trim()) {
-
-        error =
-          "Please enter your phone number."
-
-      }
-
-      else if (
-        !/^[6-9][0-9]{9}$/.test(value)
-      ) {
-
-        error =
-          "Enter a valid 10-digit Indian mobile number."
-
-      }
+      newValue =
+        value.replace(/\D/g, "").slice(0, 10)
 
     }
-
-
-
-    /* ADDRESS */
-
-    if (field === "address") {
-
-      if (!value.trim()) {
-
-        error =
-          "Please enter your delivery address."
-
-      }
-
-      else if (
-        value.trim().length < 10
-      ) {
-
-        error =
-          "Please enter a complete delivery address."
-
-      }
-
-    }
-
 
 
     /* PINCODE */
 
     if (field === "pincode") {
 
-      if (!value.trim()) {
-
-        error =
-          "Please enter your pincode."
-
-      }
-
-      else if (
-        !/^[1-9][0-9]{5}$/.test(value)
-      ) {
-
-        error =
-          "Enter a valid 6-digit pincode."
-
-      }
+      newValue =
+        value.replace(/\D/g, "").slice(0, 6)
 
     }
-
-
-
-    /* CITY */
-
-    if (field === "city") {
-
-      if (!value.trim()) {
-
-        error =
-          "Please enter your city."
-
-      }
-
-    }
-
-
-
-    /* STATE */
-
-    if (field === "state") {
-
-      if (!value.trim()) {
-
-        error =
-          "Please enter your state."
-
-      }
-
-    }
-
-
-    return error
-
-  }
-
-
-
-  function handleCustomerChange(
-    field,
-    value
-  ) {
 
 
     setCustomer(prev => ({
 
       ...prev,
 
-      [field]: value
+      [field]: newValue
 
     }))
 
 
+    /* Clear field error */
 
-    setFormTouched(prev => ({
+    if (errors[field]) {
 
-      ...prev,
+      setErrors(prev => ({
 
-      [field]: true
+        ...prev,
 
-    }))
+        [field]: ""
 
+      }))
 
-
-    setFormErrors(prev => ({
-
-      ...prev,
-
-      [field]:
-        validateField(
-          field,
-          value
-        )
-
-    }))
+    }
 
   }
 
 
-
-  function validateCustomerForm() {
-
-
-    const errors = {}
-
-
-    Object.keys(customer).forEach(
-      field => {
-
-        const error =
-          validateField(
-            field,
-            customer[field]
-          )
-
-
-        if (error) {
-
-          errors[field] = error
-
-        }
-
-      }
-    )
-
-
-
-    setFormErrors(errors)
-
-
-
-    setFormTouched({
-
-      name: true,
-      phone: true,
-      address: true,
-      pincode: true,
-      city: true,
-      state: true
-
-    })
-
-
-
-    return (
-      Object.keys(errors).length === 0
-    )
-
-  }
-
-
-
-  /* =========================
+  /* ================================
      ADD TO CART
-  ========================= */
+  ================================= */
 
   function addToCart(product) {
 
-
-    const existing =
-      cart.find(
-        item =>
-          item.id === product.id
-      )
-
+    const existing = cart.find(
+      item => item.id === product.id
+    )
 
 
     if (existing) {
@@ -546,19 +432,19 @@ function App() {
     }
 
 
+    setCart(prev => [
 
-    setCart([
-      ...cart,
+      ...prev,
       product
+
     ])
 
   }
 
 
-
-  /* =========================
+  /* ================================
      PRODUCT QUANTITY
-  ========================= */
+  ================================= */
 
   function updateProductQuantity(
     id,
@@ -568,20 +454,13 @@ function App() {
     price
   ) {
 
-
     setCart(prev => {
 
-
       const existing =
-        prev.find(
-          item =>
-            item.id === id
-        )
-
+        prev.find(item => item.id === id)
 
 
       if (existing) {
-
 
         return prev.map(item =>
 
@@ -590,15 +469,12 @@ function App() {
             ?
 
             {
-
               ...item,
-
               quantity:
                 Math.max(
                   1,
                   item.quantity + amount
                 )
-
             }
 
             :
@@ -610,19 +486,16 @@ function App() {
       }
 
 
-
       return [
 
         ...prev,
 
         {
-
           id,
           name,
           weight,
           price,
           quantity: 1
-
         }
 
       ]
@@ -632,66 +505,54 @@ function App() {
   }
 
 
-
-  /* =========================
+  /* ================================
      DIRECT ORDER
-  ========================= */
+  ================================= */
 
   function directOrder(product) {
-
 
     setDirectProduct(product)
 
 
+    setTimeout(() => {
 
-    document
-      .getElementById(
-        "customer-details"
-      )
-      ?.scrollIntoView({
+      document
+        .getElementById("customer-details")
+        ?.scrollIntoView({
+          behavior: "smooth"
+        })
 
-        behavior: "smooth"
-
-      })
+    }, 100)
 
   }
 
 
-
-  /* =========================
+  /* ================================
      CART QUANTITY
-  ========================= */
+  ================================= */
 
-  function updateQuantity(
-    index,
-    amount
-  ) {
+  function updateQuantity(index, amount) {
 
+    setCart(prev =>
 
-    setCart(
+      prev.map((item, i) =>
 
-      cart.map(
-        (item, i) =>
+        i === index
 
-          i === index
+          ?
 
-            ?
+          {
+            ...item,
+            quantity:
+              Math.max(
+                1,
+                item.quantity + amount
+              )
+          }
 
-            {
+          :
 
-              ...item,
-
-              quantity:
-                Math.max(
-                  1,
-                  item.quantity + amount
-                )
-
-            }
-
-            :
-
-            item
+          item
 
       )
 
@@ -700,39 +561,30 @@ function App() {
   }
 
 
-
-  /* =========================
+  /* ================================
      REMOVE ITEM
-  ========================= */
+  ================================= */
 
   function removeItem(index) {
 
-    setCart(
-
-      cart.filter(
-        (_, i) =>
-          i !== index
-      )
-
+    setCart(prev =>
+      prev.filter((_, i) => i !== index)
     )
 
   }
 
 
-
-  /* =========================
+  /* ================================
      SUBTOTAL
-  ========================= */
+  ================================= */
 
   function subtotal() {
 
     return cart.reduce(
 
       (total, item) =>
-
         total +
-        item.price *
-        item.quantity,
+        item.price * item.quantity,
 
       0
 
@@ -741,10 +593,9 @@ function App() {
   }
 
 
-
-  /* =========================
+  /* ================================
      DELIVERY
-  ========================= */
+  ================================= */
 
   function deliveryCharge() {
 
@@ -755,43 +606,37 @@ function App() {
   }
 
 
-
-  /* =========================
+  /* ================================
      FINAL TOTAL
-  ========================= */
+  ================================= */
 
   function finalTotal() {
 
-    return (
-      subtotal() +
-      deliveryCharge()
-    )
+    return subtotal() + deliveryCharge()
 
   }
 
 
-
-  /* =========================
+  /* ================================
      DIRECT ORDER WHATSAPP
-  ========================= */
+  ================================= */
 
   function sendDirectOrder() {
 
+    if (!validateCustomer()) {
 
-    if (!validateCustomerForm()) {
-
-      return
-
-    }
-
-
-
-    if (!directProduct) {
+      document
+        .getElementById("customer-details")
+        ?.scrollIntoView({
+          behavior: "smooth"
+        })
 
       return
 
     }
 
+
+    if (!directProduct) return
 
 
     const productTotal =
@@ -799,110 +644,83 @@ function App() {
       directProduct.quantity
 
 
-
-    const directDelivery =
-      productTotal >= 1000
-        ? 0
-        : 50
+    const delivery = 50
 
 
-
-    const directFinalTotal =
-      productTotal +
-      directDelivery
-
-
-
-    let message =
+    const message =
 
 `Hello Healthy Nuts, I want to place an order.
 
-Customer Details:
+CUSTOMER DETAILS
 
 Name: ${customer.name}
 Phone: ${customer.phone}
-Address: ${customer.address}
 Pincode: ${customer.pincode}
 City: ${customer.city}
 State: ${customer.state}
+Address: ${customer.address}
 
-
-Order Details:
+ORDER DETAILS
 
 ${directProduct.name}
 Weight: ${directProduct.weight}
 Quantity: ${directProduct.quantity}
 Price: ₹${productTotal}
 
+Delivery: ₹${delivery}
 
-Delivery:
-${directDelivery === 0 ? "FREE" : "₹50"}
-
-Final Total:
-₹${directFinalTotal}
+Final Total: ₹${productTotal + delivery}
 `
 
 
-
     openWhatsApp(message)
-
-
 
     setOrderSuccess(true)
 
   }
 
 
-
-  /* =========================
-     CART WHATSAPP ORDER
-  ========================= */
+  /* ================================
+     CART WHATSAPP
+  ================================= */
 
   function orderCartWhatsApp() {
 
+    if (!validateCustomer()) {
 
-    if (!validateCustomerForm()) {
-
-      return
-
-    }
-
-
-
-    if (cart.length === 0) {
-
-      alert(
-        "Your cart is empty."
-      )
+      document
+        .getElementById("customer-details")
+        ?.scrollIntoView({
+          behavior: "smooth"
+        })
 
       return
 
     }
 
+
+    if (cart.length === 0) return
 
 
     let message =
 
 `Hello Healthy Nuts, I want to place an order.
 
-Customer Details:
+CUSTOMER DETAILS
 
 Name: ${customer.name}
 Phone: ${customer.phone}
-Address: ${customer.address}
 Pincode: ${customer.pincode}
 City: ${customer.city}
 State: ${customer.state}
+Address: ${customer.address}
 
-
-Order Details:
+ORDER DETAILS
 
 `
 
 
-
     cart.forEach(item => {
-
 
       message +=
 
@@ -916,34 +734,39 @@ Price: ₹${item.price * item.quantity}
     })
 
 
-
     message +=
 
 `Subtotal: ₹${subtotal()}
 
 Delivery:
-${deliveryCharge() === 0
-        ? "FREE"
-        : "₹50"}
+${deliveryCharge() === 0 ? "FREE" : "₹50"}
 
 Final Total:
-₹${finalTotal()}`
-
+₹${finalTotal()}
+`
 
 
     openWhatsApp(message)
-
-
 
     setOrderSuccess(true)
 
   }
 
 
+  /* ================================
+     MOBILE MENU
+  ================================= */
 
-  /* =========================
-     ORDER SUCCESS
-  ========================= */
+  function closeMobileMenu() {
+
+    setMobileMenuOpen(false)
+
+  }
+
+
+  /* ================================
+     SUCCESS PAGE
+  ================================= */
 
   if (orderSuccess) {
 
@@ -951,35 +774,46 @@ Final Total:
 
       <div className="order-success">
 
+        <div className="success-icon">
+          ✓
+        </div>
 
         <h1>
           🎉 Thank You!
         </h1>
 
-
         <h2>
           Order request sent successfully.
         </h2>
 
+        <p>
+          Your order details have been sent to
+          Healthy Nuts on WhatsApp.
+        </p>
 
         <p>
-          Our Healthy Nuts team will contact you shortly.
+          Our team will contact you shortly.
         </p>
 
 
-
         <button
+          onClick={() => {
 
-          onClick={() =>
             setOrderSuccess(false)
-          }
 
+            setDirectProduct(null)
+
+            setCart([])
+
+            window.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            })
+
+          }}
         >
-
           Continue Shopping
-
         </button>
-
 
       </div>
 
@@ -988,135 +822,136 @@ Final Total:
   }
 
 
-
-  /* =========================
+  /* ================================
      MAIN WEBSITE
-  ========================= */
+  ================================= */
 
   return (
 
     <div className="app">
 
 
-      {/* =========================
+      {/* ================================
           HEADER
-      ========================= */}
+      ================================= */}
 
       <header className="header">
 
+  <div className="logo-section">
 
-        <div className="logo-section">
+    <img
+      src="/images/logo.jpeg"
+      alt="Healthy Nuts Logo"
+    />
 
+    <div className="brand-text">
 
-          <img
+      <h1>
+        Healthy Nuts
+      </h1>
 
-            src="/images/logo.jpeg"
+      <p className="brand-tagline">
+        Premium • Fresh • Natural
+      </p>
 
-            alt="Healthy Nuts Logo"
+    </div>
 
-          />
-
-
-          <h1>
-            Healthy Nuts
-          </h1>
-
-
-        </div>
-
-
-
-        <nav>
+  </div>
 
 
-          <a href="#home">
-            Home
-          </a>
+  <nav>
+
+    <a href="#home">
+      Home
+    </a>
+
+    <a href="#products">
+      Products
+    </a>
+
+    <a href="#cart">
+      Cart ({cart.length})
+    </a>
+
+    <a href="#reviews">
+      Reviews
+    </a>
+
+    <a href="#contact">
+      Contact
+    </a>
+
+  </nav>
+
+</header>
 
 
-          <a href="#products">
-            Products
-          </a>
-
-
-          <a href="#cart">
-            Cart ({cart.length})
-          </a>
-
-
-          <a href="#reviews">
-            Reviews
-          </a>
-
-
-          <a href="#contact">
-            Contact
-          </a>
-
-
-        </nav>
-
-
-      </header>
-
-
-
-      {/* =========================
+      {/* ================================
           HERO
-      ========================= */}
+      ================================= */}
 
       <section
         className="hero"
         id="home"
       >
 
+        <div className="hero-content">
 
-        <h2>
-          Premium Quality Dry Fruits
-        </h2>
+          <span className="hero-badge">
+            NATURAL • PREMIUM • FRESH
+          </span>
 
+          <h2>
+            Premium Quality
+            <br />
+            Dry Fruits & Seeds
+          </h2>
 
-        <p>
-          Fresh Kaju, Badam, Pista,
-          Khajur, Kismis and premium
-          dry fruits delivered to your doorstep.
-        </p>
+          <p>
+            Handpicked dry fruits, nuts and seeds
+            delivered fresh to your doorstep.
+          </p>
 
+          <button
+            onClick={() =>
+              openWhatsApp(
+                "Hello Healthy Nuts, I want to order dry fruits."
+              )
+            }
+          >
 
+            <FaWhatsapp />
 
-        <button
+            Order on WhatsApp
 
-          onClick={() =>
-            openWhatsApp(
-              "Hello Healthy Nuts, I want to order dry fruits."
-            )
-          }
+          </button>
 
-        >
-
-          Order on WhatsApp
-
-        </button>
-
+        </div>
 
       </section>
 
 
-
-      {/* =========================
+      {/* ================================
           PRODUCTS
-      ========================= */}
+      ================================= */}
 
       <section
         className="products"
         id="products"
       >
 
+        <span className="section-label">
+          OUR COLLECTION
+        </span>
 
         <h2>
-          Our Products
+          Premium Dry Fruits & Seeds
         </h2>
 
+        <p className="section-description">
+          Carefully selected for freshness,
+          taste and quality.
+        </p>
 
 
         <div className="product-container">
@@ -1125,471 +960,304 @@ Final Total:
           {/* KAJU */}
 
           <ProductCard
-
             image="/images/kaju.jpeg"
-
             name="Kaju"
-
             description="Premium Cashew Nuts"
-
             prices={{
-
               "250g": 294,
               "500g": 560,
               "1kg": 1100
-
             }}
-
             addToCart={addToCart}
-
             directOrder={directOrder}
-
             cart={cart}
-
             updateProductQuantity={
               updateProductQuantity
             }
-
           />
-
 
 
           {/* BADAM */}
 
           <ProductCard
-
             image="/images/badam.jpeg"
-
             name="Badam"
-
             description="Premium Almonds"
-
             prices={{
-
               "250g": 298,
               "500g": 575,
               "1kg": 1120
-
             }}
-
             addToCart={addToCart}
-
             directOrder={directOrder}
-
             cart={cart}
-
             updateProductQuantity={
               updateProductQuantity
             }
-
           />
-
 
 
           {/* PISTA */}
 
           <ProductCard
-
             image="/images/pista.jpeg"
-
             name="Pista"
-
             description="Premium Pistachios"
-
             prices={{
-
               "250g": 385,
               "500g": 750,
               "1kg": 1475
-
             }}
-
             addToCart={addToCart}
-
             directOrder={directOrder}
-
             cart={cart}
-
             updateProductQuantity={
               updateProductQuantity
             }
-
           />
-
 
 
           {/* KHAJUR */}
 
           <ProductCard
-
             image="/images/khajur.png"
-
             name="Khajur"
-
             description="Premium Dates"
-
             prices={{
-
               "250g": 199,
               "500g": 360,
               "1kg": 685
-
             }}
-
             addToCart={addToCart}
-
             directOrder={directOrder}
-
             cart={cart}
-
             updateProductQuantity={
               updateProductQuantity
             }
-
           />
-
 
 
           {/* KISMIS */}
 
           <ProductCard
-
             image="/images/kismis.png"
-
             name="Kismis"
-
             description="Premium Raisins"
-
             prices={{
-
               "250g": 180,
               "500g": 350,
               "1kg": 685
-
             }}
-
             addToCart={addToCart}
-
             directOrder={directOrder}
-
             cart={cart}
-
             updateProductQuantity={
               updateProductQuantity
             }
-
           />
-
 
 
           {/* AKHROOT */}
 
           <ProductCard
-
             image="/images/akhroot.png"
-
             name="Akhroot"
-
             description="Premium Walnuts"
-
             prices={{
-
               "250g": 199,
               "500g": 199,
               "1kg": 199
-
             }}
-
             addToCart={addToCart}
-
             directOrder={directOrder}
-
             cart={cart}
-
             updateProductQuantity={
               updateProductQuantity
             }
-
           />
-
 
 
           {/* ALSI */}
 
           <ProductCard
-
             image="/images/alsi.png"
-
             name="Alsi"
-
             description="Premium Flax Seeds"
-
             prices={{
-
               "250g": 199,
               "500g": 199,
               "1kg": 199
-
             }}
-
             addToCart={addToCart}
-
             directOrder={directOrder}
-
             cart={cart}
-
             updateProductQuantity={
               updateProductQuantity
             }
-
           />
-
 
 
           {/* ANJEER */}
 
           <ProductCard
-
             image="/images/anjeer.png"
-
             name="Anjeer"
-
             description="Premium Dried Figs"
-
             prices={{
-
               "250g": 199,
               "500g": 199,
               "1kg": 199
-
             }}
-
             addToCart={addToCart}
-
             directOrder={directOrder}
-
             cart={cart}
-
             updateProductQuantity={
               updateProductQuantity
             }
-
           />
-
 
 
           {/* MAKHANA */}
 
           <ProductCard
-
             image="/images/makhana.png"
-
             name="Makhana"
-
             description="Premium Fox Nuts"
-
             prices={{
-
               "250g": 199,
               "500g": 199,
               "1kg": 199
-
             }}
-
             addToCart={addToCart}
-
             directOrder={directOrder}
-
             cart={cart}
-
             updateProductQuantity={
               updateProductQuantity
             }
-
           />
 
 
-
-          {/* KHARBOOJA KE BEEJ */}
+          {/* KHARBOOJA */}
 
           <ProductCard
-
             image="/images/kharbooja-ke-beej.png"
-
             name="Kharbooja Ke Beej"
-
             description="Premium Melon Seeds"
-
             prices={{
-
               "250g": 199,
               "500g": 199,
               "1kg": 199
-
             }}
-
             addToCart={addToCart}
-
             directOrder={directOrder}
-
             cart={cart}
-
             updateProductQuantity={
               updateProductQuantity
             }
-
           />
 
 
-
-          {/* KADDU KA BEEJ */}
+          {/* KADDU */}
 
           <ProductCard
-
             image="/images/kaddu-ka-beej.png"
-
             name="Kaddu Ka Beej"
-
             description="Premium Pumpkin Seeds"
-
             prices={{
-
               "250g": 199,
               "500g": 199,
               "1kg": 199
-
             }}
-
             addToCart={addToCart}
-
             directOrder={directOrder}
-
             cart={cart}
-
             updateProductQuantity={
               updateProductQuantity
             }
-
           />
 
 
-
-          {/* SURAJMUKHI KA BEEJ */}
+          {/* SURAJMUKHI */}
 
           <ProductCard
-
             image="/images/surajmukhi-ka-beej.png"
-
             name="Surajmukhi Ka Beej"
-
             description="Premium Sunflower Seeds"
-
             prices={{
-
               "250g": 199,
               "500g": 199,
               "1kg": 199
-
             }}
-
             addToCart={addToCart}
-
             directOrder={directOrder}
-
             cart={cart}
-
             updateProductQuantity={
               updateProductQuantity
             }
-
           />
-
 
 
           {/* DRY FRUIT MIX */}
 
           <ProductCard
-
             image="/images/dry-fruit-mix.png"
-
             name="Dry Fruit Mix"
-
             description="Premium Dry Fruit Mix"
-
             prices={{
-
               "250g": 199,
               "500g": 199,
               "1kg": 199
-
             }}
-
             addToCart={addToCart}
-
             directOrder={directOrder}
-
             cart={cart}
-
             updateProductQuantity={
               updateProductQuantity
             }
-
           />
-
 
 
           {/* SEEDS MIX */}
 
           <ProductCard
-
             image="/images/seeds-mix.png"
-
             name="Seeds Mix"
-
             description="Premium Seeds Mix"
-
             prices={{
-
               "250g": 199,
               "500g": 199,
               "1kg": 199
-
             }}
-
             addToCart={addToCart}
-
             directOrder={directOrder}
-
             cart={cart}
-
             updateProductQuantity={
               updateProductQuantity
             }
-
           />
 
 
         </div>
 
-
       </section>
 
 
-
-      {/* =========================
+      {/* ================================
           CART
-      ========================= */}
+      ================================= */}
 
       <section
         className="cart"
         id="cart"
       >
 
+        <span className="section-label">
+          SHOPPING BAG
+        </span>
 
         <h2>
           Your Cart
         </h2>
-
 
 
         {
@@ -1597,164 +1265,169 @@ Final Total:
 
             ?
 
-            <p>
-              Cart is empty
-            </p>
+            <div className="empty-cart">
+
+              <div>
+                🛒
+              </div>
+
+              <h3>
+                Your cart is empty
+              </h3>
+
+              <p>
+                Add some premium dry fruits
+                to get started.
+              </p>
+
+            </div>
 
             :
 
-            cart.map(
-              (item, index) => (
+            cart.map((item, index) => (
 
-                <div
-                  className="cart-item"
-                  key={item.id}
-                >
+              <div
+                className="cart-item"
+                key={item.id}
+              >
 
+                <div className="cart-item-info">
 
                   <h3>
                     {item.name}
                   </h3>
 
-
                   <p>
                     Weight: {item.weight}
                   </p>
 
-
                   <p>
-                    Price per pack:
-                    ₹{item.price}
+                    Price per pack: ₹{item.price}
                   </p>
 
-
-                  <p>
-                    Total:
-                    ₹{item.price * item.quantity}
-                  </p>
-
-
-
-                  <button
-
-                    onClick={() =>
-                      updateQuantity(
-                        index,
-                        -1
-                      )
-                    }
-
-                  >
-
-                    -
-
-                  </button>
-
-
-
-                  <b>
-                    {item.quantity}
-                  </b>
-
-
-
-                  <button
-
-                    onClick={() =>
-                      updateQuantity(
-                        index,
-                        1
-                      )
-                    }
-
-                  >
-
-                    +
-
-                  </button>
-
-
-
-                  <button
-
-                    onClick={() =>
-                      removeItem(index)
-                    }
-
-                  >
-
-                    Remove
-
-                  </button>
-
+                  <strong>
+                    Total: ₹{item.price * item.quantity}
+                  </strong>
 
                 </div>
 
-              )
-            )
 
+                <div className="cart-actions">
+
+                  <div className="cart-quantity">
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateQuantity(index, -1)
+                      }
+                    >
+                      -
+                    </button>
+
+                    <b>
+                      {item.quantity}
+                    </b>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateQuantity(index, 1)
+                      }
+                    >
+                      +
+                    </button>
+
+                  </div>
+
+
+                  <button
+                    type="button"
+                    className="remove-button"
+                    onClick={() =>
+                      removeItem(index)
+                    }
+                  >
+                    Remove
+                  </button>
+
+                </div>
+
+              </div>
+
+            ))
         }
-
 
 
         {
           cart.length > 0 &&
 
-          <>
+          <div className="cart-summary">
+
+            <div>
+              <span>
+                Subtotal
+              </span>
+
+              <strong>
+                ₹{subtotal()}
+              </strong>
+            </div>
 
 
-            <h3>
-              Subtotal:
-              ₹{subtotal()}
-            </h3>
+            <div>
+              <span>
+                Delivery
+              </span>
+
+              <strong>
+                {
+                  deliveryCharge() === 0
+                    ? "FREE 🎉"
+                    : "₹50"
+                }
+              </strong>
+            </div>
 
 
-            <h3>
+            <div className="grand-total">
 
-              Delivery:
+              <span>
+                Total
+              </span>
 
-              {
-                deliveryCharge() === 0
+              <strong>
+                ₹{finalTotal()}
+              </strong>
 
-                  ?
+            </div>
 
-                  " FREE 🎉"
-
-                  :
-
-                  " ₹50"
-
-              }
-
-            </h3>
-
-
-            <h2>
-              Total:
-              ₹{finalTotal()}
-            </h2>
-
-
-          </>
+          </div>
 
         }
 
 
-
-        {/* =========================
+        {/* ================================
             CUSTOMER FORM
-        ========================= */}
+        ================================= */}
 
         <div
           className="customer-form"
           id="customer-details"
         >
 
+          <span className="form-label">
+            SECURE DELIVERY DETAILS
+          </span>
 
           <h3>
-            Delivery Details
+            Where should we deliver?
           </h3>
 
+          <p className="form-subtitle">
+            Enter your details so we can confirm
+            your order on WhatsApp.
+          </p>
 
 
           {/* DIRECT ORDER PREVIEW */}
@@ -1762,400 +1435,278 @@ Final Total:
           {
             directProduct &&
 
-            <div
-              className="direct-order-preview"
-            >
+            <div className="direct-order-preview">
+
+              <span>
+                DIRECT ORDER
+              </span>
 
               <h4>
-                Direct Order
+                {directProduct.name}
               </h4>
 
               <p>
-                {directProduct.name}
-              </p>
-
-              <p>
-                Weight:
                 {directProduct.weight}
-              </p>
-
-              <p>
-                Quantity:
+                {" "}×{" "}
                 {directProduct.quantity}
               </p>
 
-              <p>
-                Price:
-                ₹{
-                  directProduct.price *
-                  directProduct.quantity
-                }
-              </p>
+              <strong>
+                ₹{directProduct.price *
+                  directProduct.quantity}
+              </strong>
 
             </div>
 
           }
 
 
-
           {/* NAME */}
 
-          <div className="form-field">
+          <div
+            className={
+              `form-field ${
+                errors.name ? "has-error" : ""
+              }`
+            }
+          >
 
+            <label>
+              Full Name
+              <span>*</span>
+            </label>
 
             <input
-
               type="text"
-
-              placeholder="Your Name"
-
+              placeholder="Enter your full name"
               value={customer.name}
-
-              className={
-                formTouched.name
-
-                  ?
-
-                  formErrors.name
-                    ? "input-error"
-                    : "input-valid"
-
-                  :
-
-                  ""
-              }
-
               onChange={(e) =>
                 handleCustomerChange(
                   "name",
                   e.target.value
                 )
               }
-
             />
 
-
             {
-              formTouched.name &&
-              formErrors.name &&
+              errors.name &&
 
-              <small
-                className="field-error"
-              >
-
-                ⚠ {formErrors.name}
-
+              <small className="error-message">
+                {errors.name}
               </small>
-
             }
 
-
           </div>
-
 
 
           {/* PHONE */}
 
-          <div className="form-field">
+          <div
+            className={
+              `form-field ${
+                errors.phone ? "has-error" : ""
+              }`
+            }
+          >
 
+            <label>
+              Phone Number
+              <span>*</span>
+            </label>
 
             <input
-
               type="tel"
-
               inputMode="numeric"
-
               maxLength="10"
-
-              placeholder="10 Digit Mobile Number"
-
+              placeholder="10-digit mobile number"
               value={customer.phone}
-
-              className={
-                formTouched.phone
-
-                  ?
-
-                  formErrors.phone
-                    ? "input-error"
-                    : "input-valid"
-
-                  :
-
-                  ""
-              }
-
               onChange={(e) =>
-
                 handleCustomerChange(
-
                   "phone",
-
                   e.target.value
-                    .replace(/\D/g, "")
                 )
-
               }
-
             />
 
-
             {
-              formTouched.phone &&
-              formErrors.phone &&
+              errors.phone &&
 
-              <small
-                className="field-error"
-              >
-
-                ⚠ {formErrors.phone}
-
+              <small className="error-message">
+                {errors.phone}
               </small>
-
             }
-
 
           </div>
 
 
+          {/* PINCODE */}
 
-          {/* ADDRESS */}
+          <div
+            className={
+              `form-field ${
+                errors.pincode ? "has-error" : ""
+              }`
+            }
+          >
 
-          <div className="form-field">
+            <label>
+              Pincode
+              <span>*</span>
+            </label>
 
-
-            <textarea
-
-              placeholder="Complete Delivery Address"
-
-              value={customer.address}
-
-              className={
-                formTouched.address
-
-                  ?
-
-                  formErrors.address
-                    ? "input-error"
-                    : "input-valid"
-
-                  :
-
-                  ""
-              }
-
+            <input
+              type="text"
+              inputMode="numeric"
+              maxLength="6"
+              placeholder="6-digit pincode"
+              value={customer.pincode}
               onChange={(e) =>
                 handleCustomerChange(
-                  "address",
+                  "pincode",
                   e.target.value
                 )
               }
-
             />
 
-
             {
-              formTouched.address &&
-              formErrors.address &&
+              errors.pincode &&
 
-              <small
-                className="field-error"
-              >
-
-                ⚠ {formErrors.address}
-
+              <small className="error-message">
+                {errors.pincode}
               </small>
-
             }
 
-
           </div>
 
 
+          {/* CITY */}
 
-          {/* PINCODE + CITY */}
+          <div
+            className={
+              `form-field ${
+                errors.city ? "has-error" : ""
+              }`
+            }
+          >
 
-          <div className="form-row">
+            <label>
+              City
+              <span>*</span>
+            </label>
 
-
-            {/* PINCODE */}
-
-            <div className="form-field">
-
-
-              <input
-
-                type="text"
-
-                inputMode="numeric"
-
-                maxLength="6"
-
-                placeholder="Pincode"
-
-                value={customer.pincode}
-
-                className={
-                  formTouched.pincode
-
-                    ?
-
-                    formErrors.pincode
-                      ? "input-error"
-                      : "input-valid"
-
-                    :
-
-                    ""
-                }
-
-                onChange={(e) =>
-
-                  handleCustomerChange(
-
-                    "pincode",
-
-                    e.target.value
-                      .replace(/\D/g, "")
-                  )
-
-                }
-
-              />
-
-
-              {
-                formTouched.pincode &&
-                formErrors.pincode &&
-
-                <small
-                  className="field-error"
-                >
-
-                  ⚠ {formErrors.pincode}
-
-                </small>
-
+            <input
+              type="text"
+              placeholder="Enter your city"
+              value={customer.city}
+              onChange={(e) =>
+                handleCustomerChange(
+                  "city",
+                  e.target.value
+                )
               }
+            />
 
+            {
+              errors.city &&
 
-            </div>
-
-
-
-            {/* CITY */}
-
-            <div className="form-field">
-
-
-              <input
-
-                type="text"
-
-                placeholder="City"
-
-                value={customer.city}
-
-                className={
-                  formTouched.city
-
-                    ?
-
-                    formErrors.city
-                      ? "input-error"
-                      : "input-valid"
-
-                    :
-
-                    ""
-                }
-
-                onChange={(e) =>
-                  handleCustomerChange(
-                    "city",
-                    e.target.value
-                  )
-                }
-
-              />
-
-
-              {
-                formTouched.city &&
-                formErrors.city &&
-
-                <small
-                  className="field-error"
-                >
-
-                  ⚠ {formErrors.city}
-
-                </small>
-
-              }
-
-
-            </div>
-
+              <small className="error-message">
+                {errors.city}
+              </small>
+            }
 
           </div>
-
 
 
           {/* STATE */}
 
-          <div className="form-field">
+          <div
+            className={
+              `form-field ${
+                errors.state ? "has-error" : ""
+              }`
+            }
+          >
 
+            <label>
+              State
+              <span>*</span>
+            </label>
 
-            <input
-
-              type="text"
-
-              placeholder="State"
-
+            <select
               value={customer.state}
-
-              className={
-                formTouched.state
-
-                  ?
-
-                  formErrors.state
-                    ? "input-error"
-                    : "input-valid"
-
-                  :
-
-                  ""
-              }
-
               onChange={(e) =>
                 handleCustomerChange(
                   "state",
                   e.target.value
                 )
               }
+            >
 
-            />
+              <option value="">
+                Select your state
+              </option>
 
+              {
+                states.map(state => (
+
+                  <option
+                    key={state}
+                    value={state}
+                  >
+                    {state}
+                  </option>
+
+                ))
+              }
+
+            </select>
 
             {
-              formTouched.state &&
-              formErrors.state &&
+              errors.state &&
 
-              <small
-                className="field-error"
-              >
-
-                ⚠ {formErrors.state}
-
+              <small className="error-message">
+                {errors.state}
               </small>
-
             }
-
 
           </div>
 
+
+          {/* ADDRESS */}
+
+          <div
+            className={
+              `form-field ${
+                errors.address ? "has-error" : ""
+              }`
+            }
+          >
+
+            <label>
+              Complete Delivery Address
+              <span>*</span>
+            </label>
+
+            <textarea
+              placeholder="House / Flat No., Street, Area, Landmark..."
+              value={customer.address}
+              onChange={(e) =>
+                handleCustomerChange(
+                  "address",
+                  e.target.value
+                )
+              }
+            />
+
+            {
+              errors.address &&
+
+              <small className="error-message">
+                {errors.address}
+              </small>
+            }
+
+          </div>
 
 
           {/* DIRECT ORDER BUTTON */}
@@ -2164,19 +1715,18 @@ Final Total:
             directProduct &&
 
             <button
-              onClick={
-                sendDirectOrder
-              }
+              className="whatsapp-order-button"
+              onClick={sendDirectOrder}
             >
 
               <FaWhatsapp />
 
               Order {directProduct.name}
+              {" "}on WhatsApp
 
             </button>
 
           }
-
 
 
           {/* CART ORDER BUTTON */}
@@ -2185,9 +1735,8 @@ Final Total:
             cart.length > 0 &&
 
             <button
-              onClick={
-                orderCartWhatsApp
-              }
+              className="whatsapp-order-button"
+              onClick={orderCartWhatsApp}
             >
 
               <FaWhatsapp />
@@ -2199,27 +1748,32 @@ Final Total:
           }
 
 
-        </div>
+          <p className="privacy-note">
+            🔒 Your details are only used to process
+            your delivery order.
+          </p>
 
+        </div>
 
       </section>
 
 
-
-      {/* =========================
+      {/* ================================
           REVIEWS
-      ========================= */}
+      ================================= */}
 
       <section
         className="reviews"
         id="reviews"
       >
 
+        <span className="section-label">
+          CUSTOMER LOVE
+        </span>
 
         <h2>
-          Customer Reviews
+          What Our Customers Say
         </h2>
-
 
 
         <div className="reviews-container">
@@ -2227,137 +1781,145 @@ Final Total:
 
           <div className="review-card">
 
-
-            <div>
+            <div className="stars">
               ⭐⭐⭐⭐⭐
             </div>
 
-
             <p>
-              Fresh kaju and excellent
-              packaging. The quality is premium.
+              Fresh kaju and excellent packaging.
+              The quality is premium.
             </p>
 
-
             <b>
-              - Rahul, Kanpur
+              Rahul, Kanpur
             </b>
-
 
           </div>
 
 
-
           <div className="review-card">
 
-
-            <div>
+            <div className="stars">
               ⭐⭐⭐⭐⭐
             </div>
-
 
             <p>
               Almond quality is very good.
               Highly recommended.
             </p>
 
-
             <b>
-              - Priya, Kanpur
+              Priya, Kanpur
             </b>
-
 
           </div>
 
 
-
           <div className="review-card">
 
-
-            <div>
+            <div className="stars">
               ⭐⭐⭐⭐⭐
             </div>
 
-
             <p>
-              Fast delivery and premium
-              products. Will order again.
+              Fast delivery and premium products.
+              Will order again.
             </p>
 
-
             <b>
-              - Amit, Kanpur
+              Amit, Kanpur
             </b>
-
 
           </div>
 
 
         </div>
 
+      </section>
 
 
-        {/* =========================
-            CONTACT
-        ========================= */}
+      {/* ================================
+          CONTACT
+      ================================= */}
 
-        <section
-          className="contact"
-          id="contact"
+      <section
+        className="contact"
+        id="contact"
+      >
+
+        <span className="section-label">
+          GET IN TOUCH
+        </span>
+
+        <h2>
+          Contact Healthy Nuts
+        </h2>
+
+        <p>
+          📍 Kanpur, Uttar Pradesh
+        </p>
+
+        <p>
+          📞 +91-8896079866
+        </p>
+
+
+        <button
+          onClick={() =>
+            openWhatsApp(
+              "Hello Healthy Nuts, I want to know more."
+            )
+          }
         >
 
+          <FaWhatsapp />
 
-          <h2>
-            Contact Us
-          </h2>
+          Chat on WhatsApp
 
-
-          <p>
-            📍 Kanpur, Uttar Pradesh
-          </p>
-
-
-          <p>
-            📞 +91-8896079866
-          </p>
-
-
-
-          <button
-
-            onClick={() =>
-              openWhatsApp(
-                "Hello Healthy Nuts, I want to know more."
-              )
-            }
-
-          >
-
-            <FaWhatsapp />
-
-            Chat on WhatsApp
-
-          </button>
-
-
-        </section>
-
+        </button>
 
       </section>
 
 
-
-      {/* =========================
+      {/* ================================
           FOOTER
-      ========================= */}
+      ================================= */}
 
       <footer>
+
+        <div className="footer-logo">
+          Healthy Nuts
+        </div>
+
+        <p>
+          Premium Dry Fruits • Natural Seeds •
+          Freshness Delivered
+        </p>
 
         <p>
           © 2026 Healthy Nuts | Kanpur
         </p>
 
       </footer>
+
+
+      {/* ================================
+          FLOATING WHATSAPP
+      ================================= */}
+
+      <button
+        className="whatsapp-float"
+        onClick={() =>
+          openWhatsApp(
+            "Hello Healthy Nuts, I want to know more."
+          )
+        }
+        aria-label="Chat on WhatsApp"
+      >
+
+        <FaWhatsapp />
+
+      </button>
 
 
     </div>

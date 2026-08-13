@@ -827,8 +827,7 @@ Final Total:
     cart={cart}
     updateProductQuantity={updateProductQuantity}
   />
-
-  ```jsx
+  
 <ProductCard
 
   image="/images/kismis.png"

@@ -814,7 +814,7 @@ Final Total:
 
   {/* Khajur */}
   <ProductCard
-    image="/images/khajur.jpeg"
+    image="/images/khajur.png"
     name="Khajur"
     description="Premium Dates"
     prices={{
@@ -827,6 +827,25 @@ Final Total:
     cart={cart}
     updateProductQuantity={updateProductQuantity}
   />
+
+  ```jsx
+<ProductCard
+
+  image="/images/kismis.png"
+  name="Kismis"
+  description="Premium Raisins"
+  prices={{
+    "250g": 180,
+    "500g": 350,
+    "1kg": 685
+  }}
+  addToCart={addToCart}
+  directOrder={directOrder}
+  cart={cart}
+  updateProductQuantity={updateProductQuantity}
+/>
+```
+
 
 </div>
 

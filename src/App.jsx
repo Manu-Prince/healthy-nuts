@@ -847,6 +847,73 @@ Final Total:
 
         </div>
 
+<div className="product-container">
+
+  {/* Kaju */}
+  <ProductCard
+    image="/images/kaju.jpeg"
+    name="Kaju"
+    description="Premium Cashew Nuts"
+    prices={{
+      "250g": 294,
+      "500g": 560,
+      "1kg": 1100
+    }}
+    addToCart={addToCart}
+    directOrder={directOrder}
+    cart={cart}
+    updateProductQuantity={updateProductQuantity}
+  />
+
+  {/* Badam */}
+  <ProductCard
+    image="/images/badam.jpeg"
+    name="Badam"
+    description="Premium Almonds"
+    prices={{
+      "250g": 298,
+      "500g": 575,
+      "1kg": 1120
+    }}
+    addToCart={addToCart}
+    directOrder={directOrder}
+    cart={cart}
+    updateProductQuantity={updateProductQuantity}
+  />
+
+  {/* Pista */}
+  <ProductCard
+    image="/images/pista.jpeg"
+    name="Pista"
+    description="Premium Pistachios"
+    prices={{
+      "250g": 385,
+      "500g": 750,
+      "1kg": 1475
+    }}
+    addToCart={addToCart}
+    directOrder={directOrder}
+    cart={cart}
+    updateProductQuantity={updateProductQuantity}
+  />
+
+  {/* Khajur */}
+  <ProductCard
+    image="/images/khajur.jpeg"
+    name="Khajur"
+    description="Premium Dates"
+    prices={{
+      "250g": 199,
+      "500g": 360,
+      "1kg": 685
+    }}
+    addToCart={addToCart}
+    directOrder={directOrder}
+    cart={cart}
+    updateProductQuantity={updateProductQuantity}
+  />
+
+</div>
 
       </section>
 

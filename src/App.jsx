@@ -775,9 +775,9 @@ Final Total:
             description="Premium Cashew Nuts"
 
             prices={{
-              "250g":350,
-              "500g":650,
-              "1kg":1200
+              "250g":294,
+              "500g":560,
+              "1kg":1100
             }}
 
             addToCart={addToCart}
@@ -802,9 +802,9 @@ Final Total:
             description="Premium Almonds"
 
             prices={{
-              "250g":300,
-              "500g":550,
-              "1kg":1000
+              "250g":298,
+              "500g":575,
+              "1kg":1120
             }}
 
             addToCart={addToCart}
@@ -829,9 +829,9 @@ Final Total:
             description="Premium Pistachios"
 
             prices={{
-              "250g":400,
+              "250g":385,
               "500g":750,
-              "1kg":1400
+              "1kg":1475
             }}
 
             addToCart={addToCart}

@@ -1,11 +1,11 @@
-import { useState } from 'react'
-import { FaWhatsapp } from 'react-icons/fa'
-import './App.css'
+import { useState, useEffect, useRef } from "react"
+import { FaWhatsapp } from "react-icons/fa"
+import "./App.css"
 
 
-/* ================================
+/* =========================================================
    WHATSAPP
-================================ */
+   ========================================================= */
 
 function openWhatsApp(message) {
 
@@ -15,15 +15,16 @@ function openWhatsApp(message) {
     `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
 
   window.open(url, "_blank")
+
 }
 
 
-/* ================================
+/* =========================================================
    PRODUCT CARD
-================================ */
+   ========================================================= */
 
 function ProductCard({
-  image,
+  images,
   name,
   description,
   prices,
@@ -35,19 +36,443 @@ function ProductCard({
 
   const [weight, setWeight] = useState("250g")
 
-  const quantity =
-    cart.find(
-      item => item.id === `${name}-${weight}`
-    )?.quantity || 1
+  const [currentImage, setCurrentImage] = useState(0)
 
+  /*
+    Local quantity.
+
+    IMPORTANT:
+    This quantity is controlled locally until
+    the user actually clicks "Add to Cart".
+
+    Therefore:
+    + / - does NOT add anything to the cart.
+  */
+  const [selectedQuantity, setSelectedQuantity] = useState(1)
+
+  /*
+    Controls whether automatic image changing is paused.
+  */
+  const [autoPlayPaused, setAutoPlayPaused] = useState(false)
+
+  /*
+    Used for touch interaction on mobile.
+  */
+  const touchStartX = useRef(null)
+
+
+  /*
+    Check whether this particular product + weight
+    already exists in the cart.
+  */
+  const cartItem = cart.find(
+    item => item.id === `${name}-${weight}`
+  )
+
+
+  /*
+    If product is already in cart, show the cart quantity.
+
+    Otherwise show the local quantity selected
+    by the user.
+  */
+  const quantity =
+    cartItem
+      ? cartItem.quantity
+      : selectedQuantity
+
+
+  /* =========================================================
+     SYNC LOCAL QUANTITY WITH CART
+     ========================================================= */
+
+  useEffect(() => {
+
+    /*
+      When a product is removed from the cart,
+      reset the product quantity back to 1.
+
+      If it is still in cart, we don't change
+      selectedQuantity because the cart itself
+      controls the displayed quantity.
+    */
+
+    if (!cartItem) {
+
+      /*
+        Do not automatically reset while user
+        is simply changing weight.
+
+        The local quantity remains what the user selected.
+      */
+
+    }
+
+  }, [cartItem])
+
+
+  /* =========================================================
+     AUTOMATIC IMAGE SLIDER
+     ========================================================= */
+
+  useEffect(() => {
+
+    /*
+      If there is only one image,
+      there is nothing to auto-slide.
+    */
+
+    if (images.length <= 1) {
+      return
+    }
+
+
+    /*
+      Don't start automatic scrolling
+      while user has paused it.
+    */
+
+    if (autoPlayPaused) {
+      return
+    }
+
+
+    const interval = setInterval(() => {
+
+      setCurrentImage(prev =>
+
+        prev === images.length - 1
+          ? 0
+          : prev + 1
+
+      )
+
+    }, 3000)
+
+
+    return () => {
+      clearInterval(interval)
+    }
+
+  }, [
+    images.length,
+    autoPlayPaused
+  ])
+
+
+  /* =========================================================
+     NEXT IMAGE
+     ========================================================= */
+
+  function nextImage() {
+
+    setCurrentImage(prev =>
+
+      prev === images.length - 1
+        ? 0
+        : prev + 1
+
+    )
+
+  }
+
+
+  /* =========================================================
+     PREVIOUS IMAGE
+     ========================================================= */
+
+  function previousImage() {
+
+    setCurrentImage(prev =>
+
+      prev === 0
+        ? images.length - 1
+        : prev - 1
+
+    )
+
+  }
+
+
+  /* =========================================================
+     MOUSE ENTER
+     ========================================================= */
+
+  function handleMouseEnter() {
+
+    /*
+      On laptop/desktop:
+      hovering over the image stops
+      automatic scrolling.
+    */
+
+    setAutoPlayPaused(true)
+
+  }
+
+
+  /* =========================================================
+     MOUSE LEAVE
+     ========================================================= */
+
+  function handleMouseLeave() {
+
+    /*
+      When user moves mouse away,
+      automatic scrolling starts again.
+    */
+
+    setAutoPlayPaused(false)
+
+  }
+
+
+  /* =========================================================
+     IMAGE CLICK
+     ========================================================= */
+
+  function handleImageClick() {
+
+    /*
+      Clicking the image toggles
+      automatic sliding.
+
+      Click once  = pause
+      Click again = resume
+    */
+
+    setAutoPlayPaused(prev => !prev)
+
+  }
+
+
+  /* =========================================================
+     TOUCH START
+     ========================================================= */
+
+  function handleTouchStart(e) {
+
+    /*
+      Mobile:
+      immediately stop auto-slide
+      when user touches the image.
+    */
+
+    setAutoPlayPaused(true)
+
+    touchStartX.current =
+      e.touches[0].clientX
+
+  }
+
+
+  /* =========================================================
+     TOUCH END
+     ========================================================= */
+
+  function handleTouchEnd(e) {
+
+    if (touchStartX.current === null) {
+      return
+    }
+
+
+    const touchEndX =
+      e.changedTouches[0].clientX
+
+
+    const difference =
+      touchStartX.current - touchEndX
+
+
+    /*
+      Swipe LEFT
+    */
+
+    if (difference > 50) {
+
+      nextImage()
+
+    }
+
+
+    /*
+      Swipe RIGHT
+    */
+
+    if (difference < -50) {
+
+      previousImage()
+
+    }
+
+
+    touchStartX.current = null
+
+
+    /*
+      Resume automatic sliding
+      shortly after the touch ends.
+    */
+
+    setTimeout(() => {
+
+      setAutoPlayPaused(false)
+
+    }, 1500)
+
+  }
+
+
+  /* =========================================================
+     PRODUCT QUANTITY PLUS
+     ========================================================= */
+
+  function handleProductPlus() {
+
+    /*
+      IMPORTANT:
+
+      If the product is already in the cart,
+      update the cart quantity.
+
+      If the product is NOT in the cart,
+      only update the local quantity.
+
+      This means clicking + before Add to Cart
+      NEVER adds the product to the cart.
+    */
+
+    if (cartItem) {
+
+      updateProductQuantity(
+        `${name}-${weight}`,
+        1,
+        name,
+        weight,
+        prices[weight]
+      )
+
+      return
+
+    }
+
+
+    setSelectedQuantity(prev =>
+      prev + 1
+    )
+
+  }
+
+
+  /* =========================================================
+     PRODUCT QUANTITY MINUS
+     ========================================================= */
+
+  function handleProductMinus() {
+
+    /*
+      If product is already in cart,
+      update cart quantity.
+
+      Otherwise only update local quantity.
+    */
+
+    if (cartItem) {
+
+      updateProductQuantity(
+        `${name}-${weight}`,
+        -1,
+        name,
+        weight,
+        prices[weight]
+      )
+
+      return
+
+    }
+
+
+    setSelectedQuantity(prev =>
+      Math.max(
+        1,
+        prev - 1
+      )
+    )
+
+  }
+
+
+  /* =========================================================
+     ADD PRODUCT TO CART
+     ========================================================= */
+
+  function handleAddToCart() {
+
+    /*
+      If already in cart,
+      don't create a duplicate.
+    */
+
+    if (cartItem) {
+
+      alert(
+        `${name} (${weight}) is already in cart. Use + / - buttons to change quantity.`
+      )
+
+      return
+
+    }
+
+
+    /*
+      IMPORTANT:
+
+      selectedQuantity is used here.
+
+      Example:
+
+      Default = 1
+
+      User clicks + twice
+
+      selectedQuantity = 3
+
+      User clicks Add to Cart
+
+      Cart gets quantity = 3
+    */
+
+    addToCart({
+
+      id: `${name}-${weight}`,
+
+      name,
+
+      weight,
+
+      price: prices[weight],
+
+      quantity: selectedQuantity
+
+    })
+
+  }
+
+
+  /* =========================================================
+     ORDER PRODUCT
+     ========================================================= */
 
   function orderProduct() {
 
     directOrder({
+
       name,
       weight,
       quantity,
       price: prices[weight]
+
     })
 
   }
@@ -57,23 +482,195 @@ function ProductCard({
 
     <div className="product-card">
 
-      <img
-        src={image}
-        alt={name}
-        onError={(e) => {
-          e.currentTarget.style.background = "#f5f1e8"
-          e.currentTarget.alt = `${name} image`
-        }}
-      />
 
-      <h3>{name}</h3>
+      {/* =====================================================
+          PRODUCT IMAGE SLIDER
+      ===================================================== */}
 
-      <p>{description}</p>
+      <div
+        className={
+          `product-image-slider ${
+            autoPlayPaused
+              ? "slider-paused"
+              : ""
+          }`
+        }
+
+        onMouseEnter={handleMouseEnter}
+
+        onMouseLeave={handleMouseLeave}
+
+        onTouchStart={handleTouchStart}
+
+        onTouchEnd={handleTouchEnd}
+
+        onClick={handleImageClick}
+      >
 
 
-      {/* ================================
+        <img
+          src={images[currentImage]}
+          alt={`${name} ${currentImage + 1}`}
+
+          draggable="false"
+
+          onError={(e) => {
+
+            e.currentTarget.style.background =
+              "#f5f1e8"
+
+          }}
+        />
+
+
+        {/* ===================================================
+            PAUSED INDICATOR
+        =================================================== */}
+
+        {
+          autoPlayPaused &&
+
+          <div className="slider-pause-indicator">
+
+            ⏸
+
+          </div>
+
+        }
+
+
+        {/* ===================================================
+            PREVIOUS BUTTON
+        =================================================== */}
+
+        {
+          images.length > 1 &&
+
+          <button
+            type="button"
+
+            className={
+              `image-slider-button image-slider-prev`
+            }
+
+            onClick={(e) => {
+
+              e.stopPropagation()
+
+              previousImage()
+
+            }}
+
+            aria-label="Previous image"
+          >
+
+            ‹
+
+          </button>
+
+        }
+
+
+        {/* ===================================================
+            NEXT BUTTON
+        =================================================== */}
+
+        {
+          images.length > 1 &&
+
+          <button
+            type="button"
+
+            className={
+              `image-slider-button image-slider-next`
+            }
+
+            onClick={(e) => {
+
+              e.stopPropagation()
+
+              nextImage()
+
+            }}
+
+            aria-label="Next image"
+          >
+
+            ›
+
+          </button>
+
+        }
+
+
+        {/* ===================================================
+            DOTS
+        =================================================== */}
+
+        {
+          images.length > 1 &&
+
+          <div className="image-slider-dots">
+
+            {
+              images.map((_, index) => (
+
+                <button
+                  key={index}
+
+                  type="button"
+
+                  className={
+                    index === currentImage
+                      ? "active"
+                      : ""
+                  }
+
+                  onClick={(e) => {
+
+                    e.stopPropagation()
+
+                    setCurrentImage(index)
+
+                  }}
+
+                  aria-label={
+                    `Show image ${index + 1}`
+                  }
+                />
+
+              ))
+            }
+
+          </div>
+
+        }
+
+
+      </div>
+
+
+      {/* =====================================================
+          PRODUCT NAME
+      ===================================================== */}
+
+      <h3>
+        {name}
+      </h3>
+
+
+      {/* =====================================================
+          DESCRIPTION
+      ===================================================== */}
+
+      <p>
+        {description}
+      </p>
+
+
+      {/* =====================================================
           WEIGHT
-      ================================= */}
+      ===================================================== */}
 
       <div className="weight">
 
@@ -82,12 +679,22 @@ function ProductCard({
 
             <button
               key={item}
+
+              type="button"
+
               className={
-                weight === item ? "active" : ""
+                weight === item
+                  ? "active"
+                  : ""
               }
-              onClick={() => setWeight(item)}
+
+              onClick={() =>
+                setWeight(item)
+              }
             >
+
               {item}
+
             </button>
 
           ))
@@ -96,55 +703,49 @@ function ProductCard({
       </div>
 
 
+      {/* =====================================================
+          PRICE
+      ===================================================== */}
+
       <h4>
         Price per pack: ₹{prices[weight]}
       </h4>
 
 
-      {/* ================================
+      {/* =====================================================
           PRODUCT QUANTITY
-      ================================= */}
+      ===================================================== */}
 
       <div className="quantity-box">
 
-        {/* MINUS - RED */}
-
         <button
           type="button"
+
           className="quantity-minus"
-          onClick={() =>
-            updateProductQuantity(
-              `${name}-${weight}`,
-              -1,
-              name,
-              weight,
-              prices[weight]
-            )
-          }
+
+          onClick={handleProductMinus}
         >
+
           −
+
         </button>
 
 
-        <b>{quantity}</b>
+        <b>
+          {quantity}
+        </b>
 
-
-        {/* PLUS - GREEN */}
 
         <button
           type="button"
+
           className="quantity-plus"
-          onClick={() =>
-            updateProductQuantity(
-              `${name}-${weight}`,
-              1,
-              name,
-              weight,
-              prices[weight]
-            )
-          }
+
+          onClick={handleProductPlus}
         >
+
           +
+
         </button>
 
       </div>
@@ -155,36 +756,35 @@ function ProductCard({
       </p>
 
 
-      {/* ================================
+      {/* =====================================================
           ADD TO CART
-      ================================= */}
+      ===================================================== */}
 
       <button
         type="button"
-        onClick={() =>
-          addToCart({
-            id: `${name}-${weight}`,
-            name,
-            weight,
-            price: prices[weight],
-            quantity: 1
-          })
-        }
+
+        onClick={handleAddToCart}
       >
+
         Add to Cart
+
       </button>
 
 
-      {/* ================================
+      {/* =====================================================
           DIRECT ORDER
-      ================================= */}
+      ===================================================== */}
 
       <button
         type="button"
+
         onClick={orderProduct}
       >
+
         Order {name}
+
       </button>
+
 
     </div>
 
@@ -193,24 +793,27 @@ function ProductCard({
 }
 
 
-/* ================================
+/* =========================================================
    APP
-================================ */
+   ========================================================= */
 
 function App() {
 
   const [cart, setCart] = useState([])
 
-  const [orderSuccess, setOrderSuccess] = useState(false)
+  const [orderSuccess, setOrderSuccess] =
+    useState(false)
 
-  const [directProduct, setDirectProduct] = useState(null)
+  const [directProduct, setDirectProduct] =
+    useState(null)
 
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] =
+    useState(false)
 
 
-  /* ================================
+  /* =========================================================
      CUSTOMER DETAILS
-  ================================= */
+     ========================================================= */
 
   const [customer, setCustomer] = useState({
 
@@ -224,16 +827,16 @@ function App() {
   })
 
 
-  /* ================================
+  /* =========================================================
      FORM ERRORS
-  ================================= */
+     ========================================================= */
 
   const [errors, setErrors] = useState({})
 
 
-  /* ================================
+  /* =========================================================
      STATES
-  ================================= */
+     ========================================================= */
 
   const states = [
 
@@ -277,23 +880,25 @@ function App() {
   ]
 
 
-  /* ================================
+  /* =========================================================
      VALIDATION
-  ================================= */
+     ========================================================= */
 
   function validateCustomer() {
 
     const newErrors = {}
 
 
-    /* NAME */
-
     if (!customer.name.trim()) {
 
-      newErrors.name = "Please enter your name."
+      newErrors.name =
+        "Please enter your name."
 
     }
-    else if (customer.name.trim().length < 2) {
+
+    else if (
+      customer.name.trim().length < 2
+    ) {
 
       newErrors.name =
         "Name must contain at least 2 characters."
@@ -301,15 +906,18 @@ function App() {
     }
 
 
-    /* PHONE */
-
     if (!customer.phone.trim()) {
 
       newErrors.phone =
         "Please enter your phone number."
 
     }
-    else if (!/^[6-9][0-9]{9}$/.test(customer.phone)) {
+
+    else if (
+      !/^[6-9][0-9]{9}$/.test(
+        customer.phone
+      )
+    ) {
 
       newErrors.phone =
         "Please enter a valid 10-digit Indian mobile number."
@@ -317,15 +925,18 @@ function App() {
     }
 
 
-    /* PINCODE */
-
     if (!customer.pincode.trim()) {
 
       newErrors.pincode =
         "Please enter your 6-digit pincode."
 
     }
-    else if (!/^[0-9]{6}$/.test(customer.pincode)) {
+
+    else if (
+      !/^[0-9]{6}$/.test(
+        customer.pincode
+      )
+    ) {
 
       newErrors.pincode =
         "Pincode must contain exactly 6 digits."
@@ -333,23 +944,22 @@ function App() {
     }
 
 
-    /* CITY */
-
     if (!customer.city.trim()) {
 
       newErrors.city =
         "Please enter your city."
 
     }
-    else if (customer.city.trim().length < 2) {
+
+    else if (
+      customer.city.trim().length < 2
+    ) {
 
       newErrors.city =
         "Please enter a valid city name."
 
     }
 
-
-    /* STATE */
 
     if (!customer.state) {
 
@@ -359,15 +969,16 @@ function App() {
     }
 
 
-    /* ADDRESS */
-
     if (!customer.address.trim()) {
 
       newErrors.address =
         "Please enter your complete delivery address."
 
     }
-    else if (customer.address.trim().length < 10) {
+
+    else if (
+      customer.address.trim().length < 10
+    ) {
 
       newErrors.address =
         "Please enter a more complete address."
@@ -382,31 +993,31 @@ function App() {
   }
 
 
-  /* ================================
-     HANDLE FIELD CHANGE
-  ================================= */
+  /* =========================================================
+     HANDLE CUSTOMER CHANGE
+     ========================================================= */
 
   function handleCustomerChange(field, value) {
 
     let newValue = value
 
 
-    /* PHONE */
-
     if (field === "phone") {
 
       newValue =
-        value.replace(/\D/g, "").slice(0, 10)
+        value
+          .replace(/\D/g, "")
+          .slice(0, 10)
 
     }
 
 
-    /* PINCODE */
-
     if (field === "pincode") {
 
       newValue =
-        value.replace(/\D/g, "").slice(0, 6)
+        value
+          .replace(/\D/g, "")
+          .slice(0, 6)
 
     }
 
@@ -419,8 +1030,6 @@ function App() {
 
     }))
 
-
-    /* Clear field error */
 
     if (errors[field]) {
 
@@ -437,9 +1046,9 @@ function App() {
   }
 
 
-  /* ================================
+  /* =========================================================
      ADD TO CART
-  ================================= */
+     ========================================================= */
 
   function addToCart(product) {
 
@@ -460,9 +1069,17 @@ function App() {
     }
 
 
+    /*
+      The product is added here ONLY.
+
+      Clicking + or - before this function
+      is called does not modify the cart.
+    */
+
     setCart(prev => [
 
       ...prev,
+
       product
 
     ])
@@ -470,9 +1087,9 @@ function App() {
   }
 
 
-  /* ================================
+  /* =========================================================
      PRODUCT QUANTITY
-  ================================= */
+     ========================================================= */
 
   function updateProductQuantity(
     id,
@@ -482,60 +1099,71 @@ function App() {
     price
   ) {
 
+    /*
+      This function is now ONLY responsible
+      for products that are already in the cart.
+
+      It will NEVER create a new cart item.
+    */
+
     setCart(prev => {
 
       const existing =
-        prev.find(item => item.id === id)
-
-
-      if (existing) {
-
-        return prev.map(item =>
-
-          item.id === id
-
-            ?
-
-            {
-              ...item,
-              quantity:
-                Math.max(
-                  1,
-                  item.quantity + amount
-                )
-            }
-
-            :
-
-            item
-
+        prev.find(
+          item => item.id === id
         )
+
+
+      /*
+        If the product isn't in the cart,
+        do absolutely nothing.
+
+        This is important because the ProductCard
+        handles pre-cart quantity locally.
+      */
+
+      if (!existing) {
+
+        return prev
 
       }
 
 
-      return [
+      /*
+        Product already exists in cart,
+        so update its quantity.
+      */
 
-        ...prev,
+      return prev.map(item =>
 
-        {
-          id,
-          name,
-          weight,
-          price,
-          quantity: 1
-        }
+        item.id === id
 
-      ]
+          ?
+
+          {
+            ...item,
+
+            quantity:
+              Math.max(
+                1,
+                item.quantity + amount
+              )
+          }
+
+          :
+
+          item
+
+      )
 
     })
 
   }
 
 
-  /* ================================
+  /* =========================================================
      DIRECT ORDER
-  ================================= */
+     ========================================================= */
 
   function directOrder(product) {
 
@@ -555,11 +1183,14 @@ function App() {
   }
 
 
-  /* ================================
+  /* =========================================================
      CART QUANTITY
-  ================================= */
+     ========================================================= */
 
-  function updateQuantity(index, amount) {
+  function updateQuantity(
+    index,
+    amount
+  ) {
 
     setCart(prev =>
 
@@ -571,6 +1202,7 @@ function App() {
 
           {
             ...item,
+
             quantity:
               Math.max(
                 1,
@@ -589,22 +1221,24 @@ function App() {
   }
 
 
-  /* ================================
+  /* =========================================================
      REMOVE ITEM
-  ================================= */
+     ========================================================= */
 
   function removeItem(index) {
 
     setCart(prev =>
-      prev.filter((_, i) => i !== index)
+      prev.filter(
+        (_, i) => i !== index
+      )
     )
 
   }
 
 
-  /* ================================
+  /* =========================================================
      SUBTOTAL
-  ================================= */
+     ========================================================= */
 
   function subtotal() {
 
@@ -612,7 +1246,8 @@ function App() {
 
       (total, item) =>
         total +
-        item.price * item.quantity,
+        item.price *
+        item.quantity,
 
       0
 
@@ -621,9 +1256,9 @@ function App() {
   }
 
 
-  /* ================================
+  /* =========================================================
      DELIVERY
-  ================================= */
+     ========================================================= */
 
   function deliveryCharge() {
 
@@ -634,27 +1269,32 @@ function App() {
   }
 
 
-  /* ================================
+  /* =========================================================
      FINAL TOTAL
-  ================================= */
+     ========================================================= */
 
   function finalTotal() {
 
-    return subtotal() + deliveryCharge()
+    return (
+      subtotal() +
+      deliveryCharge()
+    )
 
   }
 
 
-  /* ================================
+  /* =========================================================
      DIRECT ORDER WHATSAPP
-  ================================= */
+     ========================================================= */
 
   function sendDirectOrder() {
 
     if (!validateCustomer()) {
 
       document
-        .getElementById("customer-details")
+        .getElementById(
+          "customer-details"
+        )
         ?.scrollIntoView({
           behavior: "smooth"
         })
@@ -708,16 +1348,18 @@ Final Total: ₹${productTotal + delivery}
   }
 
 
-  /* ================================
+  /* =========================================================
      CART WHATSAPP
-  ================================= */
+     ========================================================= */
 
   function orderCartWhatsApp() {
 
     if (!validateCustomer()) {
 
       document
-        .getElementById("customer-details")
+        .getElementById(
+          "customer-details"
+        )
         ?.scrollIntoView({
           behavior: "smooth"
         })
@@ -767,7 +1409,11 @@ Price: ₹${item.price * item.quantity}
 `Subtotal: ₹${subtotal()}
 
 Delivery:
-${deliveryCharge() === 0 ? "FREE" : "₹50"}
+${
+  deliveryCharge() === 0
+    ? "FREE"
+    : "₹50"
+}
 
 Final Total:
 ₹${finalTotal()}
@@ -781,9 +1427,18 @@ Final Total:
   }
 
 
-  /* ================================
+  /* =========================================================
      MOBILE MENU
-  ================================= */
+     ========================================================= */
+
+  function toggleMobileMenu() {
+
+    setMobileMenuOpen(
+      prev => !prev
+    )
+
+  }
+
 
   function closeMobileMenu() {
 
@@ -792,9 +1447,9 @@ Final Total:
   }
 
 
-  /* ================================
+  /* =========================================================
      SUCCESS PAGE
-  ================================= */
+     ========================================================= */
 
   if (orderSuccess) {
 
@@ -823,7 +1478,6 @@ Final Total:
           Our team will contact you shortly.
         </p>
 
-
         <button
           onClick={() => {
 
@@ -840,7 +1494,9 @@ Final Total:
 
           }}
         >
+
           Continue Shopping
+
         </button>
 
       </div>
@@ -850,18 +1506,18 @@ Final Total:
   }
 
 
-  /* ================================
+  /* =========================================================
      MAIN WEBSITE
-  ================================= */
+     ========================================================= */
 
   return (
 
     <div className="app">
 
 
-      {/* ================================
+      {/* =====================================================
           HEADER
-      ================================= */}
+      ===================================================== */}
 
       <header className="header">
 
@@ -887,7 +1543,34 @@ Final Total:
         </div>
 
 
-        <nav>
+        {/* MOBILE MENU */}
+
+        <button
+          type="button"
+          className="menu-toggle"
+          onClick={toggleMobileMenu}
+          aria-label="Toggle navigation menu"
+          aria-expanded={mobileMenuOpen}
+        >
+
+          {
+            mobileMenuOpen
+              ? "✕"
+              : "☰"
+          }
+
+        </button>
+
+
+        {/* NAVIGATION */}
+
+        <nav
+          className={
+            mobileMenuOpen
+              ? "mobile-nav active"
+              : "mobile-nav"
+          }
+        >
 
           <a
             href="#home"
@@ -929,9 +1612,9 @@ Final Total:
       </header>
 
 
-      {/* ================================
+      {/* =====================================================
           HERO
-      ================================= */}
+      ===================================================== */}
 
       <section
         className="hero"
@@ -974,9 +1657,9 @@ Final Total:
       </section>
 
 
-      {/* ================================
+      {/* =====================================================
           PRODUCTS
-      ================================= */}
+      ===================================================== */}
 
       <section
         className="products"
@@ -1003,7 +1686,11 @@ Final Total:
           {/* KAJU */}
 
           <ProductCard
-            image="/images/kaju.jpeg"
+            images={[
+              "/images/kaju-1.jpeg",
+              "/images/kaju-2.jpeg",
+              "/images/kaju-3.jpeg"
+            ]}
             name="Kaju"
             description="Premium Cashew Nuts"
             prices={{
@@ -1014,14 +1701,20 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={updateProductQuantity}
+            updateProductQuantity={
+              updateProductQuantity
+            }
           />
 
 
           {/* BADAM */}
 
           <ProductCard
-            image="/images/badam.jpeg"
+            images={[
+              "/images/badam-1.jpeg",
+              "/images/badam-2.jpeg",
+              "/images/badam-3.jpeg"
+            ]}
             name="Badam"
             description="Premium Almonds"
             prices={{
@@ -1032,14 +1725,20 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={updateProductQuantity}
+            updateProductQuantity={
+              updateProductQuantity
+            }
           />
 
 
           {/* PISTA */}
 
           <ProductCard
-            image="/images/pista.jpeg"
+            images={[
+              "/images/pista-1.jpeg",
+              "/images/pista-2.jpeg",
+              "/images/pista-3.jpeg"
+            ]}
             name="Pista"
             description="Premium Pistachios"
             prices={{
@@ -1050,14 +1749,20 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={updateProductQuantity}
+            updateProductQuantity={
+              updateProductQuantity
+            }
           />
 
 
           {/* KHAJUR */}
 
           <ProductCard
-            image="/images/khajur.png"
+            images={[
+              "/images/khajur-1.jpeg",
+              "/images/khajur-2.jpeg",
+              "/images/khajur-3.jpeg"
+            ]}
             name="Khajur"
             description="Premium Dates"
             prices={{
@@ -1068,14 +1773,20 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={updateProductQuantity}
+            updateProductQuantity={
+              updateProductQuantity
+            }
           />
 
 
           {/* KISMIS */}
 
           <ProductCard
-            image="/images/kismis.png"
+            images={[
+              "/images/kismis-1.jpeg",
+              "/images/kismis-2.jpeg",
+              "/images/kismis-3.jpeg"
+            ]}
             name="Kismis"
             description="Premium Raisins"
             prices={{
@@ -1086,14 +1797,20 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={updateProductQuantity}
+            updateProductQuantity={
+              updateProductQuantity
+            }
           />
 
 
           {/* AKHROOT */}
 
           <ProductCard
-            image="/images/akhroot.png"
+            images={[
+              "/images/akhroot-1.jpeg",
+              "/images/akhroot-2.jpeg",
+              "/images/akhroot-3.jpeg"
+            ]}
             name="Akhroot"
             description="Premium Walnuts"
             prices={{
@@ -1104,14 +1821,20 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={updateProductQuantity}
+            updateProductQuantity={
+              updateProductQuantity
+            }
           />
 
 
           {/* ALSI */}
 
           <ProductCard
-            image="/images/alsi.png"
+            images={[
+              "/images/alsi-1.jpeg",
+              "/images/alsi-2.jpeg",
+              "/images/alsi-3.jpeg"
+            ]}
             name="Alsi"
             description="Premium Flax Seeds"
             prices={{
@@ -1122,14 +1845,20 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={updateProductQuantity}
+            updateProductQuantity={
+              updateProductQuantity
+            }
           />
 
 
           {/* ANJEER */}
 
           <ProductCard
-            image="/images/anjeer.png"
+            images={[
+              "/images/anjeer-1.jpeg",
+              "/images/anjeer-2.jpeg",
+              "/images/anjeer-3.jpeg"
+            ]}
             name="Anjeer"
             description="Premium Dried Figs"
             prices={{
@@ -1140,14 +1869,20 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={updateProductQuantity}
+            updateProductQuantity={
+              updateProductQuantity
+            }
           />
 
 
           {/* MAKHANA */}
 
           <ProductCard
-            image="/images/makhana.png"
+            images={[
+              "/images/makhana-1.jpeg",
+              "/images/makhana-2.jpeg",
+              "/images/makhana-3.jpeg"
+            ]}
             name="Makhana"
             description="Premium Fox Nuts"
             prices={{
@@ -1158,14 +1893,20 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={updateProductQuantity}
+            updateProductQuantity={
+              updateProductQuantity
+            }
           />
 
 
           {/* KHARBOOJA */}
 
           <ProductCard
-            image="/images/kharbooja-ke-beej.png"
+            images={[
+              "/images/kharbooja-ke-beej-1.jpeg",
+              "/images/kharbooja-ke-beej-2.jpeg",
+              "/images/kharbooja-ke-beej-3.jpeg"
+            ]}
             name="Kharbooja Ke Beej"
             description="Premium Melon Seeds"
             prices={{
@@ -1176,14 +1917,20 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={updateProductQuantity}
+            updateProductQuantity={
+              updateProductQuantity
+            }
           />
 
 
           {/* KADDU */}
 
           <ProductCard
-            image="/images/kaddu-ka-beej.png"
+            images={[
+              "/images/kaddu-ka-beej-1.jpeg",
+              "/images/kaddu-ka-beej-2.jpeg",
+              "/images/kaddu-ka-beej-3.jpeg"
+            ]}
             name="Kaddu Ka Beej"
             description="Premium Pumpkin Seeds"
             prices={{
@@ -1194,14 +1941,20 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={updateProductQuantity}
+            updateProductQuantity={
+              updateProductQuantity
+            }
           />
 
 
           {/* SURAJMUKHI */}
 
           <ProductCard
-            image="/images/surajmukhi-ka-beej.png"
+            images={[
+              "/images/surajmukhi-ka-beej-1.jpeg",
+              "/images/surajmukhi-ka-beej-2.jpeg",
+              "/images/surajmukhi-ka-beej-3.jpeg"
+            ]}
             name="Surajmukhi Ka Beej"
             description="Premium Sunflower Seeds"
             prices={{
@@ -1212,14 +1965,20 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={updateProductQuantity}
+            updateProductQuantity={
+              updateProductQuantity
+            }
           />
 
 
           {/* DRY FRUIT MIX */}
 
           <ProductCard
-            image="/images/dry-fruit-mix.png"
+            images={[
+              "/images/dry-fruit-mix-1.jpeg",
+              "/images/dry-fruit-mix-2.jpeg",
+              "/images/dry-fruit-mix-3.jpeg"
+            ]}
             name="Dry Fruit Mix"
             description="Premium Dry Fruit Mix"
             prices={{
@@ -1230,14 +1989,20 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={updateProductQuantity}
+            updateProductQuantity={
+              updateProductQuantity
+            }
           />
 
 
           {/* SEEDS MIX */}
 
           <ProductCard
-            image="/images/seeds-mix.png"
+            images={[
+              "/images/seeds-mix-1.jpeg",
+              "/images/seeds-mix-2.jpeg",
+              "/images/seeds-mix-3.jpeg"
+            ]}
             name="Seeds Mix"
             description="Premium Seeds Mix"
             prices={{
@@ -1248,7 +2013,9 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={updateProductQuantity}
+            updateProductQuantity={
+              updateProductQuantity
+            }
           />
 
 
@@ -1257,9 +2024,9 @@ Final Total:
       </section>
 
 
-      {/* ================================
+      {/* =====================================================
           CART
-      ================================= */}
+      ===================================================== */}
 
       <section
         className="cart"
@@ -1321,28 +2088,26 @@ Final Total:
                   </p>
 
                   <strong>
-                    Total: ₹{item.price * item.quantity}
+                    Total: ₹
+                    {item.price *
+                      item.quantity}
                   </strong>
 
                 </div>
 
 
-                {/* ================================
-                    CART ACTIONS
-                ================================= */}
-
                 <div className="cart-actions">
 
                   <div className="cart-quantity">
-
-
-                    {/* CART MINUS - RED */}
 
                     <button
                       type="button"
                       className="cart-minus"
                       onClick={() =>
-                        updateQuantity(index, -1)
+                        updateQuantity(
+                          index,
+                          -1
+                        )
                       }
                     >
                       −
@@ -1354,13 +2119,14 @@ Final Total:
                     </b>
 
 
-                    {/* CART PLUS - GREEN */}
-
                     <button
                       type="button"
                       className="cart-plus"
                       onClick={() =>
-                        updateQuantity(index, 1)
+                        updateQuantity(
+                          index,
+                          1
+                        )
                       }
                     >
                       +
@@ -1368,8 +2134,6 @@ Final Total:
 
                   </div>
 
-
-                  {/* REMOVE */}
 
                   <button
                     type="button"
@@ -1443,9 +2207,9 @@ Final Total:
         }
 
 
-        {/* ================================
+        {/* ===================================================
             CUSTOMER FORM
-        ================================= */}
+        =================================================== */}
 
         <div
           className="customer-form"
@@ -1488,7 +2252,8 @@ Final Total:
               </p>
 
               <strong>
-                ₹{directProduct.price *
+                ₹
+                {directProduct.price *
                   directProduct.quantity}
               </strong>
 
@@ -1502,7 +2267,9 @@ Final Total:
           <div
             className={
               `form-field ${
-                errors.name ? "has-error" : ""
+                errors.name
+                  ? "has-error"
+                  : ""
               }`
             }
           >
@@ -1540,7 +2307,9 @@ Final Total:
           <div
             className={
               `form-field ${
-                errors.phone ? "has-error" : ""
+                errors.phone
+                  ? "has-error"
+                  : ""
               }`
             }
           >
@@ -1580,7 +2349,9 @@ Final Total:
           <div
             className={
               `form-field ${
-                errors.pincode ? "has-error" : ""
+                errors.pincode
+                  ? "has-error"
+                  : ""
               }`
             }
           >
@@ -1620,7 +2391,9 @@ Final Total:
           <div
             className={
               `form-field ${
-                errors.city ? "has-error" : ""
+                errors.city
+                  ? "has-error"
+                  : ""
               }`
             }
           >
@@ -1658,7 +2431,9 @@ Final Total:
           <div
             className={
               `form-field ${
-                errors.state ? "has-error" : ""
+                errors.state
+                  ? "has-error"
+                  : ""
               }`
             }
           >
@@ -1713,7 +2488,9 @@ Final Total:
           <div
             className={
               `form-field ${
-                errors.address ? "has-error" : ""
+                errors.address
+                  ? "has-error"
+                  : ""
               }`
             }
           >
@@ -1794,9 +2571,9 @@ Final Total:
       </section>
 
 
-      {/* ================================
+      {/* =====================================================
           REVIEWS
-      ================================= */}
+      ===================================================== */}
 
       <section
         className="reviews"
@@ -1874,9 +2651,9 @@ Final Total:
       </section>
 
 
-      {/* ================================
+      {/* =====================================================
           CONTACT
-      ================================= */}
+      ===================================================== */}
 
       <section
         className="contact"
@@ -1917,9 +2694,9 @@ Final Total:
       </section>
 
 
-      {/* ================================
+      {/* =====================================================
           FOOTER
-      ================================= */}
+      ===================================================== */}
 
       <footer>
 
@@ -1939,17 +2716,19 @@ Final Total:
       </footer>
 
 
-      {/* ================================
+      {/* =====================================================
           FLOATING WHATSAPP
-      ================================= */}
+      ===================================================== */}
 
       <button
         className="whatsapp-float"
+
         onClick={() =>
           openWhatsApp(
             "Hello Healthy Nuts, I want to know more."
           )
         }
+
         aria-label="Chat on WhatsApp"
       >
 

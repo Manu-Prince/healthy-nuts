@@ -1953,6 +1953,20 @@ function AppContent() {
 
   const location = useLocation()
 
+    /* =========================================================
+     RESET SCROLL WHEN ROUTE CHANGES
+     ========================================================= */
+
+  useEffect(() => {
+
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "auto"
+    })
+
+  }, [location.pathname])
+
 
   /* =========================================================
      CART

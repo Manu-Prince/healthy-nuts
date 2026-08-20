@@ -327,16 +327,6 @@ function ProductCard({
         />
 
 
-        {/* PAUSE INDICATOR */}
-
-        {
-          autoPlayPaused &&
-
-          <div className="slider-pause-indicator">
-            ⏸
-          </div>
-        }
-
 
         {/* PREVIOUS */}
 

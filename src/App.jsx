@@ -1,4 +1,12 @@
 import { useState, useEffect, useRef } from "react"
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link,
+  useNavigate,
+  useLocation
+} from "react-router-dom"
 import { FaWhatsapp } from "react-icons/fa"
 import "./App.css"
 
@@ -15,7 +23,6 @@ function openWhatsApp(message) {
     `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
 
   window.open(url, "_blank")
-
 }
 
 
@@ -38,77 +45,22 @@ function ProductCard({
 
   const [currentImage, setCurrentImage] = useState(0)
 
-  /*
-    Local quantity.
-
-    IMPORTANT:
-    This quantity is controlled locally until
-    the user actually clicks "Add to Cart".
-
-    Therefore:
-    + / - does NOT add anything to the cart.
-  */
   const [selectedQuantity, setSelectedQuantity] = useState(1)
 
-  /*
-    Controls whether automatic image changing is paused.
-  */
   const [autoPlayPaused, setAutoPlayPaused] = useState(false)
 
-  /*
-    Used for touch interaction on mobile.
-  */
   const touchStartX = useRef(null)
 
 
-  /*
-    Check whether this particular product + weight
-    already exists in the cart.
-  */
   const cartItem = cart.find(
     item => item.id === `${name}-${weight}`
   )
 
 
-  /*
-    If product is already in cart, show the cart quantity.
-
-    Otherwise show the local quantity selected
-    by the user.
-  */
   const quantity =
     cartItem
       ? cartItem.quantity
       : selectedQuantity
-
-
-  /* =========================================================
-     SYNC LOCAL QUANTITY WITH CART
-     ========================================================= */
-
-  useEffect(() => {
-
-    /*
-      When a product is removed from the cart,
-      reset the product quantity back to 1.
-
-      If it is still in cart, we don't change
-      selectedQuantity because the cart itself
-      controls the displayed quantity.
-    */
-
-    if (!cartItem) {
-
-      /*
-        Do not automatically reset while user
-        is simply changing weight.
-
-        The local quantity remains what the user selected.
-      */
-
-    }
-
-  }, [cartItem])
 
 
   /* =========================================================
@@ -117,47 +69,29 @@ function ProductCard({
 
   useEffect(() => {
 
-    /*
-      If there is only one image,
-      there is nothing to auto-slide.
-    */
-
     if (images.length <= 1) {
       return
     }
-
-
-    /*
-      Don't start automatic scrolling
-      while user has paused it.
-    */
 
     if (autoPlayPaused) {
       return
     }
 
-
     const interval = setInterval(() => {
 
       setCurrentImage(prev =>
-
         prev === images.length - 1
           ? 0
           : prev + 1
-
       )
 
     }, 3000)
-
 
     return () => {
       clearInterval(interval)
     }
 
-  }, [
-    images.length,
-    autoPlayPaused
-  ])
+  }, [images.length, autoPlayPaused])
 
 
   /* =========================================================
@@ -167,13 +101,10 @@ function ProductCard({
   function nextImage() {
 
     setCurrentImage(prev =>
-
       prev === images.length - 1
         ? 0
         : prev + 1
-
     )
-
   }
 
 
@@ -184,46 +115,23 @@ function ProductCard({
   function previousImage() {
 
     setCurrentImage(prev =>
-
       prev === 0
         ? images.length - 1
         : prev - 1
-
     )
-
   }
 
 
   /* =========================================================
-     MOUSE ENTER
+     MOUSE
      ========================================================= */
 
   function handleMouseEnter() {
-
-    /*
-      On laptop/desktop:
-      hovering over the image stops
-      automatic scrolling.
-    */
-
     setAutoPlayPaused(true)
-
   }
 
-
-  /* =========================================================
-     MOUSE LEAVE
-     ========================================================= */
-
   function handleMouseLeave() {
-
-    /*
-      When user moves mouse away,
-      automatic scrolling starts again.
-    */
-
     setAutoPlayPaused(false)
-
   }
 
 
@@ -232,17 +140,7 @@ function ProductCard({
      ========================================================= */
 
   function handleImageClick() {
-
-    /*
-      Clicking the image toggles
-      automatic sliding.
-
-      Click once  = pause
-      Click again = resume
-    */
-
     setAutoPlayPaused(prev => !prev)
-
   }
 
 
@@ -252,17 +150,10 @@ function ProductCard({
 
   function handleTouchStart(e) {
 
-    /*
-      Mobile:
-      immediately stop auto-slide
-      when user touches the image.
-    */
-
     setAutoPlayPaused(true)
 
     touchStartX.current =
       e.touches[0].clientX
-
   }
 
 
@@ -276,143 +167,77 @@ function ProductCard({
       return
     }
 
-
     const touchEndX =
       e.changedTouches[0].clientX
-
 
     const difference =
       touchStartX.current - touchEndX
 
-
-    /*
-      Swipe LEFT
-    */
-
     if (difference > 50) {
-
       nextImage()
-
     }
-
-
-    /*
-      Swipe RIGHT
-    */
 
     if (difference < -50) {
-
       previousImage()
-
     }
-
 
     touchStartX.current = null
 
-
-    /*
-      Resume automatic sliding
-      shortly after the touch ends.
-    */
-
     setTimeout(() => {
-
       setAutoPlayPaused(false)
-
     }, 1500)
-
   }
 
 
   /* =========================================================
-     PRODUCT QUANTITY PLUS
+     PRODUCT PLUS
      ========================================================= */
 
   function handleProductPlus() {
 
-    /*
-      IMPORTANT:
-
-      If the product is already in the cart,
-      update the cart quantity.
-
-      If the product is NOT in the cart,
-      only update the local quantity.
-
-      This means clicking + before Add to Cart
-      NEVER adds the product to the cart.
-    */
-
     if (cartItem) {
 
       updateProductQuantity(
         `${name}-${weight}`,
-        1,
-        name,
-        weight,
-        prices[weight]
+        1
       )
 
       return
-
     }
-
 
     setSelectedQuantity(prev =>
       prev + 1
     )
-
   }
 
 
   /* =========================================================
-     PRODUCT QUANTITY MINUS
+     PRODUCT MINUS
      ========================================================= */
 
   function handleProductMinus() {
-
-    /*
-      If product is already in cart,
-      update cart quantity.
-
-      Otherwise only update local quantity.
-    */
 
     if (cartItem) {
 
       updateProductQuantity(
         `${name}-${weight}`,
-        -1,
-        name,
-        weight,
-        prices[weight]
+        -1
       )
 
       return
-
     }
 
-
     setSelectedQuantity(prev =>
-      Math.max(
-        1,
-        prev - 1
-      )
+      Math.max(1, prev - 1)
     )
-
   }
 
 
   /* =========================================================
-     ADD PRODUCT TO CART
+     ADD TO CART
      ========================================================= */
 
   function handleAddToCart() {
-
-    /*
-      If already in cart,
-      don't create a duplicate.
-    */
 
     if (cartItem) {
 
@@ -421,27 +246,7 @@ function ProductCard({
       )
 
       return
-
     }
-
-
-    /*
-      IMPORTANT:
-
-      selectedQuantity is used here.
-
-      Example:
-
-      Default = 1
-
-      User clicks + twice
-
-      selectedQuantity = 3
-
-      User clicks Add to Cart
-
-      Cart gets quantity = 3
-    */
 
     addToCart({
 
@@ -456,12 +261,11 @@ function ProductCard({
       quantity: selectedQuantity
 
     })
-
   }
 
 
   /* =========================================================
-     ORDER PRODUCT
+     DIRECT ORDER
      ========================================================= */
 
   function orderProduct() {
@@ -469,19 +273,20 @@ function ProductCard({
     directOrder({
 
       name,
+
       weight,
+
       quantity,
+
       price: prices[weight]
 
     })
-
   }
 
 
   return (
 
     <div className="product-card">
-
 
       {/* =====================================================
           PRODUCT IMAGE SLIDER
@@ -507,7 +312,6 @@ function ProductCard({
         onClick={handleImageClick}
       >
 
-
         <img
           src={images[currentImage]}
           alt={`${name} ${currentImage + 1}`}
@@ -523,25 +327,18 @@ function ProductCard({
         />
 
 
-        {/* ===================================================
-            PAUSED INDICATOR
-        =================================================== */}
+        {/* PAUSE INDICATOR */}
 
         {
           autoPlayPaused &&
 
           <div className="slider-pause-indicator">
-
             ⏸
-
           </div>
-
         }
 
 
-        {/* ===================================================
-            PREVIOUS BUTTON
-        =================================================== */}
+        {/* PREVIOUS */}
 
         {
           images.length > 1 &&
@@ -549,9 +346,7 @@ function ProductCard({
           <button
             type="button"
 
-            className={
-              `image-slider-button image-slider-prev`
-            }
+            className="image-slider-button image-slider-prev"
 
             onClick={(e) => {
 
@@ -563,17 +358,12 @@ function ProductCard({
 
             aria-label="Previous image"
           >
-
             ‹
-
           </button>
-
         }
 
 
-        {/* ===================================================
-            NEXT BUTTON
-        =================================================== */}
+        {/* NEXT */}
 
         {
           images.length > 1 &&
@@ -581,9 +371,7 @@ function ProductCard({
           <button
             type="button"
 
-            className={
-              `image-slider-button image-slider-next`
-            }
+            className="image-slider-button image-slider-next"
 
             onClick={(e) => {
 
@@ -595,17 +383,12 @@ function ProductCard({
 
             aria-label="Next image"
           >
-
             ›
-
           </button>
-
         }
 
 
-        {/* ===================================================
-            DOTS
-        =================================================== */}
+        {/* DOTS */}
 
         {
           images.length > 1 &&
@@ -634,43 +417,33 @@ function ProductCard({
 
                   }}
 
-                  aria-label={
-                    `Show image ${index + 1}`
-                  }
+                  aria-label={`Show image ${index + 1}`}
                 />
 
               ))
             }
 
           </div>
-
         }
-
 
       </div>
 
 
-      {/* =====================================================
-          PRODUCT NAME
-      ===================================================== */}
+      {/* PRODUCT NAME */}
 
       <h3>
         {name}
       </h3>
 
 
-      {/* =====================================================
-          DESCRIPTION
-      ===================================================== */}
+      {/* DESCRIPTION */}
 
       <p>
         {description}
       </p>
 
 
-      {/* =====================================================
-          WEIGHT
-      ===================================================== */}
+      {/* WEIGHT */}
 
       <div className="weight">
 
@@ -692,9 +465,7 @@ function ProductCard({
                 setWeight(item)
               }
             >
-
               {item}
-
             </button>
 
           ))
@@ -703,825 +474,113 @@ function ProductCard({
       </div>
 
 
-      {/* =====================================================
-          PRICE
-      ===================================================== */}
+      {/* PRICE */}
 
       <h4>
         Price per pack: ₹{prices[weight]}
       </h4>
 
 
-      {/* =====================================================
-          PRODUCT QUANTITY
-      ===================================================== */}
+      {/* QUANTITY */}
 
       <div className="quantity-box">
 
         <button
           type="button"
-
           className="quantity-minus"
-
           onClick={handleProductMinus}
         >
-
           −
-
         </button>
-
 
         <b>
           {quantity}
         </b>
 
-
         <button
           type="button"
-
           className="quantity-plus"
-
           onClick={handleProductPlus}
         >
-
           +
-
         </button>
 
       </div>
 
 
-      <p>
+      <p className="product-quantity-label">
         Quantity: {quantity}
       </p>
 
 
-      {/* =====================================================
-          ADD TO CART
-      ===================================================== */}
+      {/* ADD TO CART */}
 
       <button
         type="button"
-
         onClick={handleAddToCart}
       >
-
         Add to Cart
-
       </button>
 
 
-      {/* =====================================================
-          DIRECT ORDER
-      ===================================================== */}
+      {/* DIRECT ORDER */}
 
       <button
         type="button"
-
         onClick={orderProduct}
       >
-
         Order {name}
-
       </button>
 
-
     </div>
-
   )
-
 }
 
 
 /* =========================================================
-   APP
+   HEADER
    ========================================================= */
 
-function App() {
+function Header({
+  cartItemCount,
+  mobileMenuOpen,
+  toggleMobileMenu,
+  closeMobileMenu,
+  goToSection
+}) {
 
-  const [cart, setCart] = useState([])
+  const navigate = useNavigate()
 
-  const [orderSuccess, setOrderSuccess] =
-    useState(false)
 
-  const [directProduct, setDirectProduct] =
-    useState(null)
+  function handleHome() {
 
-  const [mobileMenuOpen, setMobileMenuOpen] =
-    useState(false)
+    closeMobileMenu()
 
+    navigate("/")
 
-  /* =========================================================
-     CUSTOMER DETAILS
-     ========================================================= */
+    window.setTimeout(() => {
 
-  const [customer, setCustomer] = useState({
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      })
 
-    name: "",
-    phone: "",
-    pincode: "",
-    city: "",
-    state: "",
-    address: ""
-
-  })
-
-
-  /* =========================================================
-     FORM ERRORS
-     ========================================================= */
-
-  const [errors, setErrors] = useState({})
-
-
-  /* =========================================================
-     STATES
-     ========================================================= */
-
-  const states = [
-
-    "Andhra Pradesh",
-    "Arunachal Pradesh",
-    "Assam",
-    "Bihar",
-    "Chhattisgarh",
-    "Goa",
-    "Gujarat",
-    "Haryana",
-    "Himachal Pradesh",
-    "Jharkhand",
-    "Karnataka",
-    "Kerala",
-    "Madhya Pradesh",
-    "Maharashtra",
-    "Manipur",
-    "Meghalaya",
-    "Mizoram",
-    "Nagaland",
-    "Odisha",
-    "Punjab",
-    "Rajasthan",
-    "Sikkim",
-    "Tamil Nadu",
-    "Telangana",
-    "Tripura",
-    "Uttar Pradesh",
-    "Uttarakhand",
-    "West Bengal",
-    "Andaman and Nicobar Islands",
-    "Chandigarh",
-    "Dadra and Nagar Haveli and Daman and Diu",
-    "Delhi",
-    "Jammu and Kashmir",
-    "Ladakh",
-    "Lakshadweep",
-    "Puducherry"
-
-  ]
-
-
-  /* =========================================================
-     VALIDATION
-     ========================================================= */
-
-  function validateCustomer() {
-
-    const newErrors = {}
-
-
-    if (!customer.name.trim()) {
-
-      newErrors.name =
-        "Please enter your name."
-
-    }
-
-    else if (
-      customer.name.trim().length < 2
-    ) {
-
-      newErrors.name =
-        "Name must contain at least 2 characters."
-
-    }
-
-
-    if (!customer.phone.trim()) {
-
-      newErrors.phone =
-        "Please enter your phone number."
-
-    }
-
-    else if (
-      !/^[6-9][0-9]{9}$/.test(
-        customer.phone
-      )
-    ) {
-
-      newErrors.phone =
-        "Please enter a valid 10-digit Indian mobile number."
-
-    }
-
-
-    if (!customer.pincode.trim()) {
-
-      newErrors.pincode =
-        "Please enter your 6-digit pincode."
-
-    }
-
-    else if (
-      !/^[0-9]{6}$/.test(
-        customer.pincode
-      )
-    ) {
-
-      newErrors.pincode =
-        "Pincode must contain exactly 6 digits."
-
-    }
-
-
-    if (!customer.city.trim()) {
-
-      newErrors.city =
-        "Please enter your city."
-
-    }
-
-    else if (
-      customer.city.trim().length < 2
-    ) {
-
-      newErrors.city =
-        "Please enter a valid city name."
-
-    }
-
-
-    if (!customer.state) {
-
-      newErrors.state =
-        "Please select your state."
-
-    }
-
-
-    if (!customer.address.trim()) {
-
-      newErrors.address =
-        "Please enter your complete delivery address."
-
-    }
-
-    else if (
-      customer.address.trim().length < 10
-    ) {
-
-      newErrors.address =
-        "Please enter a more complete address."
-
-    }
-
-
-    setErrors(newErrors)
-
-    return Object.keys(newErrors).length === 0
-
+    }, 50)
   }
 
-
-  /* =========================================================
-     HANDLE CUSTOMER CHANGE
-     ========================================================= */
-
-  function handleCustomerChange(field, value) {
-
-    let newValue = value
-
-
-    if (field === "phone") {
-
-      newValue =
-        value
-          .replace(/\D/g, "")
-          .slice(0, 10)
-
-    }
-
-
-    if (field === "pincode") {
-
-      newValue =
-        value
-          .replace(/\D/g, "")
-          .slice(0, 6)
-
-    }
-
-
-    setCustomer(prev => ({
-
-      ...prev,
-
-      [field]: newValue
-
-    }))
-
-
-    if (errors[field]) {
-
-      setErrors(prev => ({
-
-        ...prev,
-
-        [field]: ""
-
-      }))
-
-    }
-
-  }
-
-
-  /* =========================================================
-     ADD TO CART
-     ========================================================= */
-
-  function addToCart(product) {
-
-    const existing =
-      cart.find(
-        item => item.id === product.id
-      )
-
-
-    if (existing) {
-
-      alert(
-        `${product.name} (${product.weight}) is already in cart. Use + / - buttons to change quantity.`
-      )
-
-      return
-
-    }
-
-
-    /*
-      The product is added here ONLY.
-
-      Clicking + or - before this function
-      is called does not modify the cart.
-    */
-
-    setCart(prev => [
-
-      ...prev,
-
-      product
-
-    ])
-
-  }
-
-
-  /* =========================================================
-     PRODUCT QUANTITY
-     ========================================================= */
-
-  function updateProductQuantity(
-    id,
-    amount,
-    name,
-    weight,
-    price
-  ) {
-
-    /*
-      This function is now ONLY responsible
-      for products that are already in the cart.
-
-      It will NEVER create a new cart item.
-    */
-
-    setCart(prev => {
-
-      const existing =
-        prev.find(
-          item => item.id === id
-        )
-
-
-      /*
-        If the product isn't in the cart,
-        do absolutely nothing.
-
-        This is important because the ProductCard
-        handles pre-cart quantity locally.
-      */
-
-      if (!existing) {
-
-        return prev
-
-      }
-
-
-      /*
-        Product already exists in cart,
-        so update its quantity.
-      */
-
-      return prev.map(item =>
-
-        item.id === id
-
-          ?
-
-          {
-            ...item,
-
-            quantity:
-              Math.max(
-                1,
-                item.quantity + amount
-              )
-          }
-
-          :
-
-          item
-
-      )
-
-    })
-
-  }
-
-
-  /* =========================================================
-     DIRECT ORDER
-     ========================================================= */
-
-  function directOrder(product) {
-
-    setDirectProduct(product)
-
-
-    setTimeout(() => {
-
-      document
-        .getElementById("customer-details")
-        ?.scrollIntoView({
-          behavior: "smooth"
-        })
-
-    }, 100)
-
-  }
-
-
-  /* =========================================================
-     CART QUANTITY
-     ========================================================= */
-
-  function updateQuantity(
-    index,
-    amount
-  ) {
-
-    setCart(prev =>
-
-      prev.map((item, i) =>
-
-        i === index
-
-          ?
-
-          {
-            ...item,
-
-            quantity:
-              Math.max(
-                1,
-                item.quantity + amount
-              )
-          }
-
-          :
-
-          item
-
-      )
-
-    )
-
-  }
-
-
-  /* =========================================================
-     REMOVE ITEM
-     ========================================================= */
-
-  function removeItem(index) {
-
-    setCart(prev =>
-      prev.filter(
-        (_, i) => i !== index
-      )
-    )
-
-  }
-
-
-  /* =========================================================
-     SUBTOTAL
-     ========================================================= */
-
-  function subtotal() {
-
-    return cart.reduce(
-
-      (total, item) =>
-        total +
-        item.price *
-        item.quantity,
-
-      0
-
-    )
-
-  }
-
-
-  /* =========================================================
-     DELIVERY
-     ========================================================= */
-
-  function deliveryCharge() {
-
-    return subtotal() >= 1000
-      ? 0
-      : 50
-
-  }
-
-
-  /* =========================================================
-     FINAL TOTAL
-     ========================================================= */
-
-  function finalTotal() {
-
-    return (
-      subtotal() +
-      deliveryCharge()
-    )
-
-  }
-
-
-  /* =========================================================
-     DIRECT ORDER WHATSAPP
-     ========================================================= */
-
-  function sendDirectOrder() {
-
-    if (!validateCustomer()) {
-
-      document
-        .getElementById(
-          "customer-details"
-        )
-        ?.scrollIntoView({
-          behavior: "smooth"
-        })
-
-      return
-
-    }
-
-
-    if (!directProduct) return
-
-
-    const productTotal =
-      directProduct.price *
-      directProduct.quantity
-
-
-    const delivery = 50
-
-
-    const message =
-
-`Hello Healthy Nuts, I want to place an order.
-
-CUSTOMER DETAILS
-
-Name: ${customer.name}
-Phone: ${customer.phone}
-Pincode: ${customer.pincode}
-City: ${customer.city}
-State: ${customer.state}
-Address: ${customer.address}
-
-ORDER DETAILS
-
-${directProduct.name}
-Weight: ${directProduct.weight}
-Quantity: ${directProduct.quantity}
-Price: ₹${productTotal}
-
-Delivery: ₹${delivery}
-
-Final Total: ₹${productTotal + delivery}
-`
-
-
-    openWhatsApp(message)
-
-    setOrderSuccess(true)
-
-  }
-
-
-  /* =========================================================
-     CART WHATSAPP
-     ========================================================= */
-
-  function orderCartWhatsApp() {
-
-    if (!validateCustomer()) {
-
-      document
-        .getElementById(
-          "customer-details"
-        )
-        ?.scrollIntoView({
-          behavior: "smooth"
-        })
-
-      return
-
-    }
-
-
-    if (cart.length === 0) return
-
-
-    let message =
-
-`Hello Healthy Nuts, I want to place an order.
-
-CUSTOMER DETAILS
-
-Name: ${customer.name}
-Phone: ${customer.phone}
-Pincode: ${customer.pincode}
-City: ${customer.city}
-State: ${customer.state}
-Address: ${customer.address}
-
-ORDER DETAILS
-
-`
-
-
-    cart.forEach(item => {
-
-      message +=
-
-`${item.name}
-Weight: ${item.weight}
-Quantity: ${item.quantity}
-Price: ₹${item.price * item.quantity}
-
-`
-
-    })
-
-
-    message +=
-
-`Subtotal: ₹${subtotal()}
-
-Delivery:
-${
-  deliveryCharge() === 0
-    ? "FREE"
-    : "₹50"
-}
-
-Final Total:
-₹${finalTotal()}
-`
-
-
-    openWhatsApp(message)
-
-    setOrderSuccess(true)
-
-  }
-
-
-  /* =========================================================
-     MOBILE MENU
-     ========================================================= */
-
-  function toggleMobileMenu() {
-
-    setMobileMenuOpen(
-      prev => !prev
-    )
-
-  }
-
-
-  function closeMobileMenu() {
-
-    setMobileMenuOpen(false)
-
-  }
-
-
-  /* =========================================================
-     SUCCESS PAGE
-     ========================================================= */
-
-  if (orderSuccess) {
-
-    return (
-
-      <div className="order-success">
-
-        <div className="success-icon">
-          ✓
-        </div>
-
-        <h1>
-          🎉 Thank You!
-        </h1>
-
-        <h2>
-          Order request sent successfully.
-        </h2>
-
-        <p>
-          Your order details have been sent to
-          Healthy Nuts on WhatsApp.
-        </p>
-
-        <p>
-          Our team will contact you shortly.
-        </p>
-
-        <button
-          onClick={() => {
-
-            setOrderSuccess(false)
-
-            setDirectProduct(null)
-
-            setCart([])
-
-            window.scrollTo({
-              top: 0,
-              behavior: "smooth"
-            })
-
-          }}
-        >
-
-          Continue Shopping
-
-        </button>
-
-      </div>
-
-    )
-
-  }
-
-
-  /* =========================================================
-     MAIN WEBSITE
-     ========================================================= */
 
   return (
 
-    <div className="app">
+    <header className="header">
 
+      <div className="logo-section">
 
-      {/* =====================================================
-          HEADER
-      ===================================================== */}
-
-      <header className="header">
-
-        <div className="logo-section">
+        <button
+          type="button"
+          className="logo-button"
+          onClick={handleHome}
+          aria-label="Go to Healthy Nuts home"
+        >
 
           <img
             src="/images/logo.jpeg"
@@ -1540,77 +599,164 @@ Final Total:
 
           </div>
 
-        </div>
+        </button>
+
+      </div>
 
 
-        {/* MOBILE MENU */}
+      {/* MOBILE MENU */}
+
+      <button
+        type="button"
+
+        className="menu-toggle"
+
+        onClick={toggleMobileMenu}
+
+        aria-label="Toggle navigation menu"
+
+        aria-expanded={mobileMenuOpen}
+      >
+        {
+          mobileMenuOpen
+            ? "✕"
+            : "☰"
+        }
+      </button>
+
+
+      {/* NAVIGATION */}
+
+      <nav
+        className={
+          mobileMenuOpen
+            ? "mobile-nav active"
+            : "mobile-nav"
+        }
+      >
 
         <button
           type="button"
-          className="menu-toggle"
-          onClick={toggleMobileMenu}
-          aria-label="Toggle navigation menu"
-          aria-expanded={mobileMenuOpen}
+          className="nav-link-button"
+          onClick={handleHome}
         >
-
-          {
-            mobileMenuOpen
-              ? "✕"
-              : "☰"
-          }
-
+          Home
         </button>
 
 
-        {/* NAVIGATION */}
-
-        <nav
-          className={
-            mobileMenuOpen
-              ? "mobile-nav active"
-              : "mobile-nav"
-          }
+        <button
+          type="button"
+          className="nav-link-button"
+          onClick={() => goToSection("products")}
         >
+          Products
+        </button>
 
-          <a
-            href="#home"
-            onClick={closeMobileMenu}
-          >
-            Home
-          </a>
 
-          <a
-            href="#products"
-            onClick={closeMobileMenu}
-          >
-            Products
-          </a>
+        <Link
+          to="/cart"
+          className="cart-nav-link"
+          onClick={closeMobileMenu}
+        >
+          Cart
+          <span className="header-cart-count">
+            {cartItemCount}
+          </span>
+        </Link>
 
-          <a
-            href="#cart"
-            onClick={closeMobileMenu}
-          >
-            Cart ({cart.length})
-          </a>
 
-          <a
-            href="#reviews"
-            onClick={closeMobileMenu}
-          >
-            Reviews
-          </a>
+        <button
+          type="button"
+          className="nav-link-button"
+          onClick={() => goToSection("reviews")}
+        >
+          Reviews
+        </button>
 
-          <a
-            href="#contact"
-            onClick={closeMobileMenu}
-          >
-            Contact
-          </a>
 
-        </nav>
+        <button
+          type="button"
+          className="nav-link-button"
+          onClick={() => goToSection("contact")}
+        >
+          Contact
+        </button>
 
-      </header>
+      </nav>
 
+    </header>
+  )
+}
+
+
+/* =========================================================
+   MOBILE CART BAR
+   ========================================================= */
+
+function MobileCartBar({
+  cartItemCount,
+  cartTotal
+}) {
+
+  if (cartItemCount === 0) {
+    return null
+  }
+
+
+  return (
+
+    <Link
+      to="/cart"
+      className="mobile-cart-bar"
+    >
+
+      <div className="mobile-cart-icon">
+        🛒
+      </div>
+
+      <div className="mobile-cart-info">
+
+        <strong>
+          View Cart
+        </strong>
+
+        <span>
+          {cartItemCount}{" "}
+          {cartItemCount === 1
+            ? "item"
+            : "items"}
+        </span>
+
+      </div>
+
+      <div className="mobile-cart-total">
+        ₹{cartTotal}
+      </div>
+
+      <div className="mobile-cart-arrow">
+        →
+      </div>
+
+    </Link>
+  )
+}
+
+
+/* =========================================================
+   HOME PAGE
+   ========================================================= */
+
+function HomePage({
+  cart,
+  addToCart,
+  directOrder,
+  updateProductQuantity,
+  openWhatsApp
+}) {
+
+  return (
+
+    <>
 
       {/* =====================================================
           HERO
@@ -1701,9 +847,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1725,9 +869,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1749,9 +891,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1773,9 +913,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1797,9 +935,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1821,9 +957,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1845,9 +979,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1869,9 +1001,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1893,9 +1023,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1917,9 +1045,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1941,9 +1067,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1965,9 +1089,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -1989,9 +1111,7 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
 
 
@@ -2013,11 +1133,8 @@ Final Total:
             addToCart={addToCart}
             directOrder={directOrder}
             cart={cart}
-            updateProductQuantity={
-              updateProductQuantity
-            }
+            updateProductQuantity={updateProductQuantity}
           />
-
 
         </div>
 
@@ -2025,13 +1142,178 @@ Final Total:
 
 
       {/* =====================================================
-          CART
+          REVIEWS
       ===================================================== */}
 
       <section
-        className="cart"
-        id="cart"
+        className="reviews"
+        id="reviews"
       >
+
+        <span className="section-label">
+          CUSTOMER LOVE
+        </span>
+
+        <h2>
+          What Our Customers Say
+        </h2>
+
+        <div className="reviews-container">
+
+          <div className="review-card">
+
+            <div className="stars">
+              ⭐⭐⭐⭐⭐
+            </div>
+
+            <p>
+              Fresh kaju and excellent packaging.
+              The quality is premium.
+            </p>
+
+            <b>
+              Rahul, Kanpur
+            </b>
+
+          </div>
+
+
+          <div className="review-card">
+
+            <div className="stars">
+              ⭐⭐⭐⭐⭐
+            </div>
+
+            <p>
+              Almond quality is very good.
+              Highly recommended.
+            </p>
+
+            <b>
+              Priya, Kanpur
+            </b>
+
+          </div>
+
+
+          <div className="review-card">
+
+            <div className="stars">
+              ⭐⭐⭐⭐⭐
+            </div>
+
+            <p>
+              Fast delivery and premium products.
+              Will order again.
+            </p>
+
+            <b>
+              Amit, Kanpur
+            </b>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      {/* =====================================================
+          CONTACT
+      ===================================================== */}
+
+      <section
+        className="contact"
+        id="contact"
+      >
+
+        <span className="section-label">
+          GET IN TOUCH
+        </span>
+
+        <h2>
+          Contact Healthy Nuts
+        </h2>
+
+        <p>
+          📍 Kanpur, Uttar Pradesh
+        </p>
+
+        <p>
+          📞 +91-8448070193
+        </p>
+
+        <button
+          onClick={() =>
+            openWhatsApp(
+              "Hello Healthy Nuts, I want to know more."
+            )
+          }
+        >
+
+          <FaWhatsapp />
+
+          Chat on WhatsApp
+
+        </button>
+
+      </section>
+
+
+      {/* =====================================================
+          FOOTER
+      ===================================================== */}
+
+      <footer>
+
+        <div className="footer-logo">
+          Healthy Nuts
+        </div>
+
+        <p>
+          Premium Dry Fruits • Natural Seeds •
+          Freshness Delivered
+        </p>
+
+        <p>
+          © 2026 Healthy Nuts | Kanpur
+        </p>
+
+      </footer>
+
+    </>
+  )
+}
+
+
+/* =========================================================
+   CART PAGE
+   ========================================================= */
+
+function CartPage({
+  cart,
+  customer,
+  errors,
+  states,
+  directProduct,
+  handleCustomerChange,
+  updateQuantity,
+  removeItem,
+  subtotal,
+  deliveryCharge,
+  finalTotal,
+  sendDirectOrder,
+  orderCartWhatsApp
+}) {
+
+  const navigate = useNavigate()
+
+
+  return (
+
+    <main className="cart-page">
+
+      <div className="cart-page-header">
 
         <span className="section-label">
           SHOPPING BAG
@@ -2041,31 +1323,90 @@ Final Total:
           Your Cart
         </h2>
 
+        <p>
+          Review your order and enter your
+          delivery details below.
+        </p>
 
-        {
-          cart.length === 0
+      </div>
 
-            ?
 
-            <div className="empty-cart">
+      {/* =====================================================
+          EMPTY CART
+      ===================================================== */}
 
-              <div>
-                🛒
-              </div>
+      {
+        cart.length === 0 && !directProduct &&
 
-              <h3>
-                Your cart is empty
-              </h3>
+        <div className="empty-cart">
 
-              <p>
-                Add some premium dry fruits
-                to get started.
-              </p>
+          <div className="empty-cart-icon">
+            🛒
+          </div>
 
-            </div>
+          <h3>
+            Your cart is empty
+          </h3>
 
-            :
+          <p>
+            Add some premium dry fruits
+            to get started.
+          </p>
 
+          <button
+            type="button"
+            onClick={() => navigate("/")}
+          >
+            Continue Shopping
+          </button>
+
+        </div>
+      }
+
+
+      {/* =====================================================
+          DIRECT ORDER
+      ===================================================== */}
+
+      {
+        directProduct &&
+
+        <div className="direct-order-preview cart-direct-preview">
+
+          <span>
+            DIRECT ORDER
+          </span>
+
+          <h4>
+            {directProduct.name}
+          </h4>
+
+          <p>
+            {directProduct.weight}
+            {" "}×{" "}
+            {directProduct.quantity}
+          </p>
+
+          <strong>
+            ₹
+            {directProduct.price *
+              directProduct.quantity}
+          </strong>
+
+        </div>
+      }
+
+
+      {/* =====================================================
+          CART ITEMS
+      ===================================================== */}
+
+      {
+        cart.length > 0 &&
+
+        <div className="cart-items-container">
+
+          {
             cart.map((item, index) => (
 
               <div
@@ -2109,15 +1450,14 @@ Final Total:
                           -1
                         )
                       }
+                      aria-label={`Decrease ${item.name} quantity`}
                     >
                       −
                     </button>
 
-
                     <b>
                       {item.quantity}
                     </b>
-
 
                     <button
                       type="button"
@@ -2128,6 +1468,7 @@ Final Total:
                           1
                         )
                       }
+                      aria-label={`Increase ${item.name} quantity`}
                     >
                       +
                     </button>
@@ -2150,69 +1491,87 @@ Final Total:
               </div>
 
             ))
-        }
+          }
+
+        </div>
+      }
 
 
-        {
-          cart.length > 0 &&
+      {/* =====================================================
+          CART SUMMARY
+      ===================================================== */}
 
-          <div className="cart-summary">
+      {
+        cart.length > 0 &&
 
-            <div>
+        <div className="cart-summary">
 
-              <span>
-                Subtotal
-              </span>
+          <div>
+            <span>
+              Items
+            </span>
 
-              <strong>
-                ₹{subtotal()}
-              </strong>
-
-            </div>
-
-
-            <div>
-
-              <span>
-                Delivery
-              </span>
-
-              <strong>
-
-                {
-                  deliveryCharge() === 0
-                    ? "FREE 🎉"
-                    : "₹50"
-                }
-
-              </strong>
-
-            </div>
+            <strong>
+              {cart.reduce(
+                (total, item) =>
+                  total + item.quantity,
+                0
+              )}
+            </strong>
+          </div>
 
 
-            <div className="grand-total">
+          <div>
+            <span>
+              Subtotal
+            </span>
 
-              <span>
-                Total
-              </span>
+            <strong>
+              ₹{subtotal()}
+            </strong>
+          </div>
 
-              <strong>
-                ₹{finalTotal()}
-              </strong>
 
-            </div>
+          <div>
+            <span>
+              Delivery
+            </span>
+
+            <strong>
+              {
+                deliveryCharge() === 0
+                  ? "FREE 🎉"
+                  : "₹50"
+              }
+            </strong>
+          </div>
+
+
+          <div className="grand-total">
+
+            <span>
+              Total
+            </span>
+
+            <strong>
+              ₹{finalTotal()}
+            </strong>
 
           </div>
 
-        }
+        </div>
+      }
 
 
-        {/* ===================================================
-            CUSTOMER FORM
-        =================================================== */}
+      {/* =====================================================
+          CUSTOMER DETAILS
+      ===================================================== */}
+
+      {
+        (cart.length > 0 || directProduct) &&
 
         <div
-          className="customer-form"
+          className="customer-form cart-customer-form"
           id="customer-details"
         >
 
@@ -2228,38 +1587,6 @@ Final Total:
             Enter your details so we can confirm
             your order on WhatsApp.
           </p>
-
-
-          {/* DIRECT ORDER PREVIEW */}
-
-          {
-            directProduct &&
-
-            <div className="direct-order-preview">
-
-              <span>
-                DIRECT ORDER
-              </span>
-
-              <h4>
-                {directProduct.name}
-              </h4>
-
-              <p>
-                {directProduct.weight}
-                {" "}×{" "}
-                {directProduct.quantity}
-              </p>
-
-              <strong>
-                ₹
-                {directProduct.price *
-                  directProduct.quantity}
-              </strong>
-
-            </div>
-
-          }
 
 
           {/* NAME */}
@@ -2522,7 +1849,7 @@ Final Total:
           </div>
 
 
-          {/* DIRECT ORDER BUTTON */}
+          {/* DIRECT ORDER */}
 
           {
             directProduct &&
@@ -2538,11 +1865,10 @@ Final Total:
               {" "}on WhatsApp
 
             </button>
-
           }
 
 
-          {/* CART ORDER BUTTON */}
+          {/* CART ORDER */}
 
           {
             cart.length > 0 &&
@@ -2557,7 +1883,6 @@ Final Total:
               Order Cart on WhatsApp
 
             </button>
-
           }
 
 
@@ -2567,180 +1892,895 @@ Final Total:
           </p>
 
         </div>
+      }
 
-      </section>
+    </main>
+  )
+}
 
 
-      {/* =====================================================
-          REVIEWS
-      ===================================================== */}
+/* =========================================================
+   ORDER SUCCESS
+   ========================================================= */
 
-      <section
-        className="reviews"
-        id="reviews"
+function OrderSuccess({
+  resetAfterSuccess
+}) {
+
+  return (
+
+    <div className="order-success">
+
+      <div className="success-icon">
+        ✓
+      </div>
+
+      <h1>
+        🎉 Thank You!
+      </h1>
+
+      <h2>
+        Order request sent successfully.
+      </h2>
+
+      <p>
+        Your order details have been sent to
+        Healthy Nuts on WhatsApp.
+      </p>
+
+      <p>
+        Our team will contact you shortly.
+      </p>
+
+      <button
+        onClick={resetAfterSuccess}
       >
+        Continue Shopping
+      </button>
 
-        <span className="section-label">
-          CUSTOMER LOVE
-        </span>
-
-        <h2>
-          What Our Customers Say
-        </h2>
+    </div>
+  )
+}
 
 
-        <div className="reviews-container">
+/* =========================================================
+   APP CONTENT
+   ========================================================= */
+
+function AppContent() {
+
+  const navigate = useNavigate()
+
+  const location = useLocation()
 
 
-          <div className="review-card">
+  /* =========================================================
+     CART
+     ========================================================= */
 
-            <div className="stars">
-              ⭐⭐⭐⭐⭐
-            </div>
-
-            <p>
-              Fresh kaju and excellent packaging.
-              The quality is premium.
-            </p>
-
-            <b>
-              Rahul, Kanpur
-            </b>
-
-          </div>
+  const [cart, setCart] = useState([])
 
 
-          <div className="review-card">
+  /* =========================================================
+     ORDER SUCCESS
+     ========================================================= */
 
-            <div className="stars">
-              ⭐⭐⭐⭐⭐
-            </div>
-
-            <p>
-              Almond quality is very good.
-              Highly recommended.
-            </p>
-
-            <b>
-              Priya, Kanpur
-            </b>
-
-          </div>
+  const [orderSuccess, setOrderSuccess] =
+    useState(false)
 
 
-          <div className="review-card">
+  /* =========================================================
+     DIRECT PRODUCT
+     ========================================================= */
 
-            <div className="stars">
-              ⭐⭐⭐⭐⭐
-            </div>
-
-            <p>
-              Fast delivery and premium products.
-              Will order again.
-            </p>
-
-            <b>
-              Amit, Kanpur
-            </b>
-
-          </div>
+  const [directProduct, setDirectProduct] =
+    useState(null)
 
 
-        </div>
+  /* =========================================================
+     MOBILE MENU
+     ========================================================= */
 
-      </section>
+  const [mobileMenuOpen, setMobileMenuOpen] =
+    useState(false)
 
 
-      {/* =====================================================
-          CONTACT
-      ===================================================== */}
+  /* =========================================================
+     CUSTOMER
+     ========================================================= */
 
-      <section
-        className="contact"
-        id="contact"
-      >
+  const [customer, setCustomer] = useState({
 
-        <span className="section-label">
-          GET IN TOUCH
-        </span>
+    name: "",
+    phone: "",
+    pincode: "",
+    city: "",
+    state: "",
+    address: ""
 
-        <h2>
-          Contact Healthy Nuts
-        </h2>
+  })
 
-        <p>
-          📍 Kanpur, Uttar Pradesh
-        </p>
 
-        <p>
-          📞 +91-8448070193
-        </p>
+  /* =========================================================
+     ERRORS
+     ========================================================= */
 
+  const [errors, setErrors] = useState({})
+
+
+  /* =========================================================
+     STATES
+     ========================================================= */
+
+  const states = [
+
+    "Andhra Pradesh",
+    "Arunachal Pradesh",
+    "Assam",
+    "Bihar",
+    "Chhattisgarh",
+    "Goa",
+    "Gujarat",
+    "Haryana",
+    "Himachal Pradesh",
+    "Jharkhand",
+    "Karnataka",
+    "Kerala",
+    "Madhya Pradesh",
+    "Maharashtra",
+    "Manipur",
+    "Meghalaya",
+    "Mizoram",
+    "Nagaland",
+    "Odisha",
+    "Punjab",
+    "Rajasthan",
+    "Sikkim",
+    "Tamil Nadu",
+    "Telangana",
+    "Tripura",
+    "Uttar Pradesh",
+    "Uttarakhand",
+    "West Bengal",
+    "Andaman and Nicobar Islands",
+    "Chandigarh",
+    "Dadra and Nagar Haveli and Daman and Diu",
+    "Delhi",
+    "Jammu and Kashmir",
+    "Ladakh",
+    "Lakshadweep",
+    "Puducherry"
+
+  ]
+
+
+  /* =========================================================
+     TOTAL ITEM COUNT
+     ========================================================= */
+
+  const cartItemCount =
+    cart.reduce(
+      (total, item) =>
+        total + item.quantity,
+      0
+    )
+
+
+  /* =========================================================
+     SUBTOTAL
+     ========================================================= */
+
+  function subtotal() {
+
+    return cart.reduce(
+
+      (total, item) =>
+        total +
+        item.price *
+        item.quantity,
+
+      0
+    )
+  }
+
+
+  /* =========================================================
+     DELIVERY
+     ========================================================= */
+
+  function deliveryCharge() {
+
+    return subtotal() >= 1000
+      ? 0
+      : 50
+  }
+
+
+  /* =========================================================
+     FINAL TOTAL
+     ========================================================= */
+
+  function finalTotal() {
+
+    return (
+      subtotal() +
+      deliveryCharge()
+    )
+  }
+
+
+  /* =========================================================
+     MOBILE MENU
+     ========================================================= */
+
+  function toggleMobileMenu() {
+
+    setMobileMenuOpen(
+      prev => !prev
+    )
+  }
+
+
+  function closeMobileMenu() {
+
+    setMobileMenuOpen(false)
+  }
+
+
+  /* =========================================================
+     SECTION NAVIGATION
+     ========================================================= */
+
+  function goToSection(id) {
+
+    closeMobileMenu()
+
+    if (location.pathname !== "/") {
+
+      navigate("/")
+
+      window.setTimeout(() => {
+
+        document
+          .getElementById(id)
+          ?.scrollIntoView({
+            behavior: "smooth"
+          })
+
+      }, 100)
+
+      return
+    }
+
+    document
+      .getElementById(id)
+      ?.scrollIntoView({
+        behavior: "smooth"
+      })
+  }
+
+
+  /* =========================================================
+     VALIDATION
+     ========================================================= */
+
+  function validateCustomer() {
+
+    const newErrors = {}
+
+
+    if (!customer.name.trim()) {
+
+      newErrors.name =
+        "Please enter your name."
+
+    }
+
+    else if (
+      customer.name.trim().length < 2
+    ) {
+
+      newErrors.name =
+        "Name must contain at least 2 characters."
+
+    }
+
+
+    if (!customer.phone.trim()) {
+
+      newErrors.phone =
+        "Please enter your phone number."
+
+    }
+
+    else if (
+      !/^[6-9][0-9]{9}$/.test(
+        customer.phone
+      )
+    ) {
+
+      newErrors.phone =
+        "Please enter a valid 10-digit Indian mobile number."
+
+    }
+
+
+    if (!customer.pincode.trim()) {
+
+      newErrors.pincode =
+        "Please enter your 6-digit pincode."
+
+    }
+
+    else if (
+      !/^[0-9]{6}$/.test(
+        customer.pincode
+      )
+    ) {
+
+      newErrors.pincode =
+        "Pincode must contain exactly 6 digits."
+
+    }
+
+
+    if (!customer.city.trim()) {
+
+      newErrors.city =
+        "Please enter your city."
+
+    }
+
+    else if (
+      customer.city.trim().length < 2
+    ) {
+
+      newErrors.city =
+        "Please enter a valid city name."
+
+    }
+
+
+    if (!customer.state) {
+
+      newErrors.state =
+        "Please select your state."
+
+    }
+
+
+    if (!customer.address.trim()) {
+
+      newErrors.address =
+        "Please enter your complete delivery address."
+
+    }
+
+    else if (
+      customer.address.trim().length < 10
+    ) {
+
+      newErrors.address =
+        "Please enter a more complete address."
+
+    }
+
+
+    setErrors(newErrors)
+
+    return Object.keys(newErrors).length === 0
+  }
+
+
+  /* =========================================================
+     CUSTOMER CHANGE
+     ========================================================= */
+
+  function handleCustomerChange(field, value) {
+
+    let newValue = value
+
+
+    if (field === "phone") {
+
+      newValue =
+        value
+          .replace(/\D/g, "")
+          .slice(0, 10)
+    }
+
+
+    if (field === "pincode") {
+
+      newValue =
+        value
+          .replace(/\D/g, "")
+          .slice(0, 6)
+    }
+
+
+    setCustomer(prev => ({
+
+      ...prev,
+
+      [field]: newValue
+
+    }))
+
+
+    if (errors[field]) {
+
+      setErrors(prev => ({
+
+        ...prev,
+
+        [field]: ""
+
+      }))
+    }
+  }
+
+
+  /* =========================================================
+     ADD TO CART
+     ========================================================= */
+
+  function addToCart(product) {
+
+    const existing =
+      cart.find(
+        item => item.id === product.id
+      )
+
+
+    if (existing) {
+
+      alert(
+        `${product.name} (${product.weight}) is already in cart. Use + / - buttons to change quantity.`
+      )
+
+      return
+    }
+
+
+    setCart(prev => [
+
+      ...prev,
+
+      product
+
+    ])
+  }
+
+
+  /* =========================================================
+     UPDATE PRODUCT QUANTITY
+     ========================================================= */
+
+  function updateProductQuantity(
+    id,
+    amount
+  ) {
+
+    setCart(prev => {
+
+      const existing =
+        prev.find(
+          item => item.id === id
+        )
+
+
+      if (!existing) {
+        return prev
+      }
+
+
+      return prev.map(item =>
+
+        item.id === id
+
+          ?
+
+          {
+            ...item,
+
+            quantity:
+              Math.max(
+                1,
+                item.quantity + amount
+              )
+          }
+
+          :
+
+          item
+      )
+    })
+  }
+
+
+  /* =========================================================
+     DIRECT ORDER
+     ========================================================= */
+
+  function directOrder(product) {
+
+    setDirectProduct(product)
+
+    navigate("/cart")
+
+    window.setTimeout(() => {
+
+      document
+        .getElementById("customer-details")
+        ?.scrollIntoView({
+          behavior: "smooth"
+        })
+
+    }, 150)
+  }
+
+
+  /* =========================================================
+     CART QUANTITY
+     ========================================================= */
+
+  function updateQuantity(
+    index,
+    amount
+  ) {
+
+    setCart(prev =>
+
+      prev.map((item, i) =>
+
+        i === index
+
+          ?
+
+          {
+            ...item,
+
+            quantity:
+              Math.max(
+                1,
+                item.quantity + amount
+              )
+          }
+
+          :
+
+          item
+      )
+    )
+  }
+
+
+  /* =========================================================
+     REMOVE ITEM
+     ========================================================= */
+
+  function removeItem(index) {
+
+    setCart(prev =>
+      prev.filter(
+        (_, i) => i !== index
+      )
+    )
+  }
+
+
+  /* =========================================================
+     DIRECT ORDER WHATSAPP
+     ========================================================= */
+
+  function sendDirectOrder() {
+
+    if (!validateCustomer()) {
+
+      document
+        .getElementById("customer-details")
+        ?.scrollIntoView({
+          behavior: "smooth"
+        })
+
+      return
+    }
+
+
+    if (!directProduct) {
+      return
+    }
+
+
+    const productTotal =
+      directProduct.price *
+      directProduct.quantity
+
+
+    const delivery = 50
+
+
+    const message =
+
+`Hello Healthy Nuts, I want to place an order.
+
+CUSTOMER DETAILS
+
+Name: ${customer.name}
+Phone: ${customer.phone}
+Pincode: ${customer.pincode}
+City: ${customer.city}
+State: ${customer.state}
+Address: ${customer.address}
+
+ORDER DETAILS
+
+${directProduct.name}
+Weight: ${directProduct.weight}
+Quantity: ${directProduct.quantity}
+Price: ₹${productTotal}
+
+Delivery: ₹${delivery}
+
+Final Total: ₹${productTotal + delivery}
+`
+
+
+    openWhatsApp(message)
+
+    setOrderSuccess(true)
+  }
+
+
+  /* =========================================================
+     CART WHATSAPP
+     ========================================================= */
+
+  function orderCartWhatsApp() {
+
+    if (!validateCustomer()) {
+
+      document
+        .getElementById("customer-details")
+        ?.scrollIntoView({
+          behavior: "smooth"
+        })
+
+      return
+    }
+
+
+    if (cart.length === 0) {
+      return
+    }
+
+
+    let message =
+
+`Hello Healthy Nuts, I want to place an order.
+
+CUSTOMER DETAILS
+
+Name: ${customer.name}
+Phone: ${customer.phone}
+Pincode: ${customer.pincode}
+City: ${customer.city}
+State: ${customer.state}
+Address: ${customer.address}
+
+ORDER DETAILS
+
+`
+
+
+    cart.forEach(item => {
+
+      message +=
+
+`${item.name}
+Weight: ${item.weight}
+Quantity: ${item.quantity}
+Price: ₹${item.price * item.quantity}
+
+`
+
+    })
+
+
+    message +=
+
+`Subtotal: ₹${subtotal()}
+
+Delivery:
+${
+  deliveryCharge() === 0
+    ? "FREE"
+    : "₹50"
+}
+
+Final Total:
+₹${finalTotal()}
+`
+
+
+    openWhatsApp(message)
+
+    setOrderSuccess(true)
+  }
+
+
+  /* =========================================================
+     RESET AFTER SUCCESS
+     ========================================================= */
+
+  function resetAfterSuccess() {
+
+    setOrderSuccess(false)
+
+    setDirectProduct(null)
+
+    setCart([])
+
+    setCustomer({
+
+      name: "",
+      phone: "",
+      pincode: "",
+      city: "",
+      state: "",
+      address: ""
+
+    })
+
+    setErrors({})
+
+    navigate("/")
+
+    window.setTimeout(() => {
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      })
+
+    }, 100)
+  }
+
+
+  /* =========================================================
+     SUCCESS SCREEN
+     ========================================================= */
+
+  if (orderSuccess) {
+
+    return (
+
+      <OrderSuccess
+        resetAfterSuccess={resetAfterSuccess}
+      />
+    )
+  }
+
+
+  /* =========================================================
+     MAIN APP
+     ========================================================= */
+
+  return (
+
+    <div className="app">
+
+      <Header
+        cartItemCount={cartItemCount}
+        mobileMenuOpen={mobileMenuOpen}
+        toggleMobileMenu={toggleMobileMenu}
+        closeMobileMenu={closeMobileMenu}
+        goToSection={goToSection}
+      />
+
+
+      <Routes>
+
+        <Route
+          path="/"
+          element={
+            <HomePage
+              cart={cart}
+              addToCart={addToCart}
+              directOrder={directOrder}
+              updateProductQuantity={
+                updateProductQuantity
+              }
+              openWhatsApp={openWhatsApp}
+            />
+          }
+        />
+
+
+        <Route
+          path="/cart"
+          element={
+            <CartPage
+              cart={cart}
+              customer={customer}
+              errors={errors}
+              states={states}
+              directProduct={directProduct}
+              handleCustomerChange={
+                handleCustomerChange
+              }
+              updateQuantity={updateQuantity}
+              removeItem={removeItem}
+              subtotal={subtotal}
+              deliveryCharge={deliveryCharge}
+              finalTotal={finalTotal}
+              sendDirectOrder={
+                sendDirectOrder
+              }
+              orderCartWhatsApp={
+                orderCartWhatsApp
+              }
+            />
+          }
+        />
+
+      </Routes>
+
+
+      {/* MOBILE CART BAR */}
+
+      {
+        location.pathname !== "/cart" &&
+
+        <MobileCartBar
+          cartItemCount={cartItemCount}
+          cartTotal={finalTotal()}
+        />
+      }
+
+
+      {/* FLOATING WHATSAPP */}
+
+      {
+        location.pathname !== "/cart" &&
 
         <button
+          className="whatsapp-float"
+
           onClick={() =>
             openWhatsApp(
               "Hello Healthy Nuts, I want to know more."
             )
           }
+
+          aria-label="Chat on WhatsApp"
         >
 
           <FaWhatsapp />
 
-          Chat on WhatsApp
-
         </button>
-
-      </section>
-
-
-      {/* =====================================================
-          FOOTER
-      ===================================================== */}
-
-      <footer>
-
-        <div className="footer-logo">
-          Healthy Nuts
-        </div>
-
-        <p>
-          Premium Dry Fruits • Natural Seeds •
-          Freshness Delivered
-        </p>
-
-        <p>
-          © 2026 Healthy Nuts | Kanpur
-        </p>
-
-      </footer>
-
-
-      {/* =====================================================
-          FLOATING WHATSAPP
-      ===================================================== */}
-
-      <button
-        className="whatsapp-float"
-
-        onClick={() =>
-          openWhatsApp(
-            "Hello Healthy Nuts, I want to know more."
-          )
-        }
-
-        aria-label="Chat on WhatsApp"
-      >
-
-        <FaWhatsapp />
-
-      </button>
-
+      }
 
     </div>
-
   )
+}
 
+
+/* =========================================================
+   ROOT APP
+   ========================================================= */
+
+function App() {
+
+  return (
+
+    <BrowserRouter>
+
+      <AppContent />
+
+    </BrowserRouter>
+  )
 }
 
 

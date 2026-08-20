@@ -9,7 +9,7 @@ import "./App.css"
 
 function openWhatsApp(message) {
 
-  const phoneNumber = "918896079866"
+  const phoneNumber = "918448070193"
 
   const url =
     `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
@@ -2673,7 +2673,7 @@ Final Total:
         </p>
 
         <p>
-          📞 +91-8896079866
+          📞 +91-8448070193
         </p>
 
 
